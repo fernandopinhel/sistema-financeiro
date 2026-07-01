@@ -1,0 +1,36 @@
+{
+  "badge": {
+    "radius":   { "value": "{radius.full}", "type": "borderRadius" },
+    "paddingX": { "value": "{spacing.200}", "type": "spacing" },
+    "paddingY": { "value": "{spacing.50}",  "type": "spacing" },
+    "dot": {
+      "size": { "value": "8", "type": "sizing" },
+      "radius": { "value": "{radius.full}", "type": "borderRadius" }
+    },
+    "status": {
+      "visible": {
+        "bg":   { "value": "{feedback.success.bg}",   "type": "color" },
+        "text": { "value": "{feedback.success.text}", "type": "color" }
+      },
+      "hidden": {
+        "bg":   { "value": "{slate.100}", "type": "color" },
+        "text": { "value": "{slate.500}", "type": "color" }
+      }
+    }
+  },
+  "alert": {
+    "radius":   { "value": "{radius.lg}", "type": "borderRadius" },
+    "paddingX": { "value": "{spacing.400}", "type": "spacing" },
+    "paddingY": { "value": "{spacing.300}", "type": "spacing" },
+    "success": {
+      "bg":     { "value": "{feedback.success.bg}",     "type": "color" },
+      "text":   { "value": "{feedback.success.text}",   "type": "color" },
+      "border": { "value": "{feedback.success.border}", "type": "color" }
+    },
+    "error": {
+      "bg":     { "value": "{feedback.danger.bg}",     "type": "color" },
+      "text":   { "value": "{feedback.danger.default}","type": "color" },
+      "border": { "value": "{feedback.danger.border}", "type": "color" }
+    }
+  }
+}

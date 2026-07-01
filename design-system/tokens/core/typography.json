@@ -1,0 +1,30 @@
+{
+  "fontFamilies": {
+    "sans": { "value": "DM Sans", "type": "fontFamilies" },
+    "mono": { "value": "DM Mono", "type": "fontFamilies" }
+  },
+  "fontWeights": {
+    "normal":   { "value": "400", "type": "fontWeights" },
+    "medium":   { "value": "500", "type": "fontWeights" },
+    "semibold": { "value": "600", "type": "fontWeights" },
+    "bold":     { "value": "700", "type": "fontWeights" },
+    "extrabold":{ "value": "800", "type": "fontWeights" }
+  },
+  "fontSize": {
+    "xs":   { "value": "12", "type": "fontSizes" },
+    "sm":   { "value": "14", "type": "fontSizes" },
+    "base": { "value": "16", "type": "fontSizes" },
+    "lg":   { "value": "18", "type": "fontSizes" },
+    "xl":   { "value": "20", "type": "fontSizes" },
+    "2xl":  { "value": "24", "type": "fontSizes" },
+    "3xl":  { "value": "30", "type": "fontSizes" }
+  },
+  "lineHeight": {
+    "tight":  { "value": "1.2", "type": "lineHeights" },
+    "normal": { "value": "1.5", "type": "lineHeights" }
+  },
+  "letterSpacing": {
+    "tight": { "value": "-0.5", "type": "letterSpacing" },
+    "wide":  { "value": "0.1em", "type": "letterSpacing" }
+  }
+}
