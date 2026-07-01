@@ -11,8 +11,9 @@ O **Finanças FP** é uma aplicação web construída com Laravel 12 + Alpine.js
 - Dashboard com gráfico de gastos mensais e cards de resumo
 - CRUD completo de transações (receitas e despesas)
 - Categorias com cores personalizáveis e indicador de dashboard
+- Contas recorrentes (modelos de receita/despesa mensal com lembrete de pendência no dashboard)
 - Exportação de relatórios em **Excel (CSV)** e **PDF**
-- Autenticação completa com reCAPTCHA v2
+- Autenticação completa com reCAPTCHA v2 e login social via **Google (OAuth)**
 - Upload de avatar de perfil
 - Banner de consentimento de cookies (LGPD)
 - Rastreamento via **Google Tag Manager**, **Google Analytics 4** e **Hotjar**
@@ -28,7 +29,7 @@ O **Finanças FP** é uma aplicação web construída com Laravel 12 + Alpine.js
 | Front-end | Alpine.js 3 · Tailwind CSS 3 |
 | Build | Vite 6 · Laravel Vite Plugin |
 | Banco de dados | MySQL 8 |
-| Autenticação | Laravel Breeze (customizado) |
+| Autenticação | Laravel Breeze (customizado) · Laravel Socialite (login Google) |
 | Anti-bot | Google reCAPTCHA v2 |
 | Analytics | Google Tag Manager · GA4 · Hotjar |
 | E-mail | SMTP (Gmail / Mailtrap) |
@@ -263,9 +264,10 @@ sistema-financeiro/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
-│   │   │   ├── Auth/                    # Autenticação (login, registro, reset)
+│   │   │   ├── Auth/                    # Autenticação (login, registro, reset, login Google)
 │   │   │   ├── CategoryController.php   # CRUD de categorias
 │   │   │   ├── ProfileController.php    # Perfil + upload de avatar
+│   │   │   ├── RecurringTemplateController.php # CRUD de contas recorrentes
 │   │   │   └── TransactionController.php # Transações + dashboard + exports
 │   │   └── Requests/
 │   │       ├── Auth/LoginRequest.php    # Validação com reCAPTCHA
@@ -274,12 +276,15 @@ sistema-financeiro/
 │   │   └── ResetPasswordMail.php        # E-mail de redefinição personalizado
 │   ├── Models/
 │   │   ├── Category.php
+│   │   ├── RecurringTemplate.php
 │   │   ├── Transaction.php
 │   │   └── User.php
 │   ├── Providers/
 │   │   └── AppServiceProvider.php       # Registro do mail customizado
-│   └── Rules/
-│       └── ReCaptcha.php                # Rule de validação reCAPTCHA
+│   ├── Rules/
+│   │   └── ReCaptcha.php                # Rule de validação reCAPTCHA
+│   └── Services/
+│       └── RecurringService.php         # Calcula recorrentes pendentes do mês
 │
 ├── config/
 │   ├── services.php                     # Chaves de reCAPTCHA e serviços
@@ -317,6 +322,10 @@ sistema-financeiro/
 │       │   └── conteudo.blade.php       # Centro de preferências de privacidade
 │       ├── profile/
 │       │   └── edit.blade.php           # Edição de perfil + avatar
+│       ├── recurring/
+│       │   ├── create.blade.php         # Nova conta recorrente
+│       │   ├── edit.blade.php           # Editar conta recorrente
+│       │   └── index.blade.php          # Lista de recorrentes
 │       ├── transactions/
 │       │   ├── create.blade.php
 │       │   ├── edit.blade.php
