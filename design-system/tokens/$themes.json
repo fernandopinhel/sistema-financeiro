@@ -1,0 +1,19 @@
+[
+  {
+    "id": "fp-light",
+    "name": "Finanças FP — Light",
+    "selectedTokenSets": {
+      "core/color": "source",
+      "core/typography": "source",
+      "core/spacing": "source",
+      "core/radius": "source",
+      "core/shadow": "source",
+      "semantic/color": "enabled",
+      "semantic/typography": "enabled",
+      "component/button": "enabled",
+      "component/input": "enabled",
+      "component/card": "enabled",
+      "component/badge": "enabled"
+    }
+  }
+]

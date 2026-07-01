@@ -1,0 +1,51 @@
+{
+  "button": {
+    "radius": { "value": "{radius.lg}", "type": "borderRadius" },
+    "paddingX": { "value": "{spacing.400}", "type": "spacing" },
+    "paddingY": { "value": "{spacing.250}", "type": "spacing" },
+    "gap": { "value": "{spacing.200}", "type": "spacing" },
+    "primary": {
+      "bg":          { "value": "{action.primary.default}", "type": "color" },
+      "bg-hover":    { "value": "{action.primary.hover}",    "type": "color" },
+      "text":        { "value": "{text.on-accent}",          "type": "color" },
+      "shadow-hover":{ "value": "{shadow.button-accent}",    "type": "boxShadow" }
+    },
+    "secondary": {
+      "bg":         { "value": "{action.primary.subtle}",       "type": "color" },
+      "bg-hover":   { "value": "{action.primary.subtle-hover}", "type": "color" },
+      "text":       { "value": "{action.primary.default}",      "type": "color" },
+      "text-hover": { "value": "{action.primary.hover}",         "type": "color" },
+      "border":     { "value": "{action.primary.border}",       "type": "color" },
+      "border-hover": { "value": "{action.primary.border-hover}", "type": "color" }
+    },
+    "ghost": {
+      "bg":       { "value": "transparent",       "type": "color" },
+      "bg-hover": { "value": "{bg.canvas}",        "type": "color" },
+      "text":     { "value": "{text.muted}",       "type": "color" },
+      "text-hover":{ "value": "{text.primary}",    "type": "color" },
+      "border":   { "value": "{border.default}",   "type": "color" }
+    },
+    "danger": {
+      "bg":       { "value": "transparent",              "type": "color" },
+      "bg-hover": { "value": "{feedback.danger.default}", "type": "color" },
+      "text":     { "value": "{feedback.danger.default}", "type": "color" },
+      "text-hover":{ "value": "{text.on-accent}",         "type": "color" },
+      "border":   { "value": "{feedback.danger.default}", "type": "color" }
+    },
+    "size": {
+      "sm": {
+        "paddingX": { "value": "{spacing.350}", "type": "spacing" },
+        "paddingY": { "value": "{spacing.150}", "type": "spacing" },
+        "fontSize": { "value": "{fontSize.sm}", "type": "fontSizes" }
+      },
+      "md": {
+        "paddingX": { "value": "{spacing.500}", "type": "spacing" },
+        "paddingY": { "value": "{spacing.250}", "type": "spacing" },
+        "fontSize": { "value": "{fontSize.sm}", "type": "fontSizes" }
+      }
+    },
+    "disabled": {
+      "opacity": { "value": "0.5", "type": "opacity" }
+    }
+  }
+}

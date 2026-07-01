@@ -1,0 +1,40 @@
+{
+  "input": {
+    "radius":  { "value": "{radius.lg}", "type": "borderRadius" },
+    "paddingX":{ "value": "{spacing.400}", "type": "spacing" },
+    "paddingY":{ "value": "{spacing.250}", "type": "spacing" },
+    "bg":      { "value": "{bg.surface}",    "type": "color" },
+    "text":    { "value": "{text.primary}",  "type": "color" },
+    "placeholder": { "value": "{slate.400}", "type": "color" },
+    "border": {
+      "default": { "value": "{border.default}",       "type": "color" },
+      "focus":   { "value": "{action.primary.default}","type": "color" },
+      "error":   { "value": "{feedback.danger.default}","type": "color" }
+    },
+    "ring": {
+      "focus": { "value": "rgba(67,97,238,0.12)", "type": "color" },
+      "error": { "value": "rgba(230,57,70,0.10)",  "type": "color" }
+    }
+  },
+  "select": {
+    "radius":  { "value": "{radius.lg}", "type": "borderRadius" },
+    "paddingX":{ "value": "{spacing.400}", "type": "spacing" },
+    "paddingY":{ "value": "{spacing.250}", "type": "spacing" },
+    "paddingRight": { "value": "{spacing.900}", "type": "spacing" },
+    "border":  { "value": "{border.default}", "type": "color" },
+    "chevron": { "value": "{slate.500}", "type": "color" }
+  },
+  "toggle": {
+    "track": {
+      "off": { "value": "{slate.200}", "type": "color" },
+      "on":  { "value": "{action.primary.subtle}", "type": "color" },
+      "ring-on": { "value": "{action.primary.border}", "type": "color" }
+    },
+    "thumb": {
+      "off": { "value": "{neutral.white}", "type": "color" },
+      "on":  { "value": "{action.primary.default}", "type": "color" }
+    },
+    "width":  { "value": "44", "type": "sizing" },
+    "height": { "value": "24", "type": "sizing" }
+  }
+}

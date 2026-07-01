@@ -1,0 +1,15 @@
+{
+  "tokenSetOrder": [
+    "core/color",
+    "core/typography",
+    "core/spacing",
+    "core/radius",
+    "core/shadow",
+    "semantic/color",
+    "semantic/typography",
+    "component/button",
+    "component/input",
+    "component/card",
+    "component/badge"
+  ]
+}

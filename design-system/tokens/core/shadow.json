@@ -1,0 +1,35 @@
+{
+  "shadow": {
+    "sm": {
+      "value": { "x": "0", "y": "1", "blur": "2", "spread": "0", "color": "rgba(0,0,0,0.05)", "type": "dropShadow" },
+      "type": "boxShadow"
+    },
+    "md": {
+      "value": { "x": "0", "y": "1", "blur": "3", "spread": "0", "color": "rgba(0,0,0,0.10)", "type": "dropShadow" },
+      "type": "boxShadow"
+    },
+    "lg": {
+      "value": { "x": "0", "y": "8", "blur": "24", "spread": "0", "color": "rgba(0,0,0,0.12)", "type": "dropShadow" },
+      "type": "boxShadow"
+    },
+    "xl": {
+      "value": { "x": "0", "y": "20", "blur": "40", "spread": "0", "color": "rgba(0,0,0,0.15)", "type": "dropShadow" },
+      "type": "boxShadow"
+    },
+    "card": {
+      "value": [
+        { "x": "0", "y": "1", "blur": "3", "spread": "0", "color": "rgba(26,29,46,0.08)", "type": "dropShadow" },
+        { "x": "0", "y": "4", "blur": "16", "spread": "0", "color": "rgba(26,29,46,0.06)", "type": "dropShadow" }
+      ],
+      "type": "boxShadow"
+    },
+    "card-elevated": {
+      "value": { "x": "0", "y": "4", "blur": "32", "spread": "0", "color": "rgba(26,29,46,0.08)", "type": "dropShadow" },
+      "type": "boxShadow"
+    },
+    "button-accent": {
+      "value": { "x": "0", "y": "4", "blur": "12", "spread": "0", "color": "rgba(67,97,238,0.30)", "type": "dropShadow" },
+      "type": "boxShadow"
+    }
+  }
+}
