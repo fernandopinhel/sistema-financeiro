@@ -6,10 +6,16 @@
 </style>
 <button id="foundations">Construir Foundations</button>
 <button id="components">Construir Components</button>
-<p>Cada botão desenha só a página correspondente. Rodar de novo duplica os frames (não os styles).</p>
+<button id="patterns">Construir Patterns</button>
+<button id="changelog">Construir Changelog</button>
+<p>Cada botão desenha só a página correspondente. Rodar de novo duplica os frames (não os styles). Rode Components antes de Patterns pra reaproveitar os componentes já criados.</p>
 <script>
   document.getElementById('foundations').onclick = () =>
     parent.postMessage({ pluginMessage: { type: 'build-foundations' } }, '*');
   document.getElementById('components').onclick = () =>
     parent.postMessage({ pluginMessage: { type: 'build-components' } }, '*');
+  document.getElementById('patterns').onclick = () =>
+    parent.postMessage({ pluginMessage: { type: 'build-patterns' } }, '*');
+  document.getElementById('changelog').onclick = () =>
+    parent.postMessage({ pluginMessage: { type: 'build-changelog' } }, '*');
 </script>

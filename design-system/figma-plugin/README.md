@@ -1,9 +1,9 @@
 # DS Builder (plugin interno do Figma)
 
-Plugin com uma UI de dois botões que constrói, cada um, uma página do arquivo
-Figma a partir dos valores em `design-system/tokens/` e dos SVGs reais das
-views Blade, copiados diretamente para `code.js` (a Figma Plugin API não lê
-arquivos do disco):
+Plugin com uma UI de quatro botões que constrói, cada um, uma página do
+arquivo Figma a partir dos valores em `design-system/tokens/`, do histórico
+de commits e dos SVGs reais das views Blade, copiados diretamente para
+`code.js` (a Figma Plugin API não lê arquivos do disco):
 
 - **Construir Foundations** — cores, tipografia, espaçamento, radius, sombra.
 - **Construir Components** — Icons (SVG reais importados como vetor), Button
@@ -12,6 +12,15 @@ arquivos do disco):
   Card, Dropdown Menu (usuário), Chart (mockup estático) e os organismos
   Sidebar e Topbar — tudo como Components de verdade do Figma (aparecem em
   Assets).
+- **Construir Patterns** — telas completas montadas a partir dos componentes
+  acima: Login, Dashboard, Lista (Transações) e Formulário (Nova Transação).
+  Reaproveita os Components já criados na página Components (Sidebar,
+  Topbar, Button, Input, etc.) em vez de duplicar — rode "Construir
+  Components" primeiro pra isso funcionar direito.
+- **Construir Changelog** — log datado de mudanças no design system,
+  copiado à mão de `git log --pretty=format:'%ad|%s' -- design-system/`.
+  **Não é automático** — sempre que um token/componente mudar, é preciso
+  atualizar o array `CHANGELOG` em `code.js` com a nova entrada.
 
 ## Instalar no Figma
 
@@ -21,15 +30,17 @@ arquivos do disco):
 3. Selecione o arquivo `design-system/figma-plugin/manifest.json` deste
    repositório.
 4. Menu → **Plugins** → **Development** → **Finanças FP — DS Builder** → Run.
-5. Na janela do plugin, clique em **"Construir Foundations"** e/ou
-   **"Construir Components"**.
+5. Na janela do plugin, clique nos botões **na ordem**: Foundations →
+   Components → Patterns → Changelog (Patterns depende de Components já
+   existir; os outros três são independentes entre si).
 
 Se você editar `code.js` depois de já ter importado o plugin, não precisa
 reimportar — só rodar de novo (Figma recarrega o arquivo a cada execução).
 
 ## O que ele faz
 
-- Cria (ou reaproveita) as páginas **Foundations** e **Components**.
+- Cria (ou reaproveita) as páginas **Foundations**, **Components**,
+  **Patterns** e **Changelog**.
 - Cria Color Styles, Text Styles e Effect Styles **pelo nome exato do token**
   (ex: `action/primary/default`, `heading/page`, `shadow/card`) — se um style
   com esse nome já existir (como os que você já criou manualmente via Tokens
@@ -43,6 +54,9 @@ reimportar — só rodar de novo (Figma recarrega o arquivo a cada execução).
   `Sidebar/default`, etc.) são `ComponentNode`s reais — aparecem no painel
   **Assets** desta biblioteca, agrupados pela barra `/` no nome, prontos pra
   arrastar/instanciar.
+- Ao montar os Patterns, procura primeiro por um Component já existente com
+  o mesmo nome em qualquer página do arquivo (`figma.root.findOne`) e
+  instancia ele; só cria um novo se não achar nenhum.
 
 ## Limitações
 
@@ -51,9 +65,9 @@ reimportar — só rodar de novo (Figma recarrega o arquivo a cada execução).
   os *estilos* não duplicam (são reaproveitados pelo nome), mas os desenhos
   sim. Pra rebuildar do zero, apague o conteúdo da página antes de rodar de
   novo.
-- Se os nomes dos styles criados manualmente no Tokens Studio não baterem
+- Se os nomes dos styles/componentes criados manualmente não baterem
   exatamente com os daqui (ex: maiúscula/minúscula diferente), o plugin cria
-  um style novo em paralelo em vez de reaproveitar — nesse caso, apague o
+  um novo em paralelo em vez de reaproveitar — nesse caso, apague o
   duplicado que não quiser manter.
 - O **Chart** é um mockup estático (barras com alturas fixas) — não é um
   componente de design system de verdade, é só uma referência visual do
@@ -62,6 +76,9 @@ reimportar — só rodar de novo (Figma recarrega o arquivo a cada execução).
   componente "parece" com hover), não states reais do Figma acionados por
   interação — para isso seria preciso configurar variant properties
   interativas manualmente depois.
-- Ainda não gera moléculas/organismos mais específicos (Form Field completo
-  com validação, Radio Card, Empty State, Pagination, Dashboard Summary
-  inteiro, Confirm Modal) — é um próximo passo natural se fizer falta.
+- O **Changelog** não lê o git de verdade em tempo real (a Plugin API não
+  tem acesso a isso) — é uma lista copiada à mão, que fica desatualizada se
+  ninguém adicionar a entrada nova quando um token/componente mudar.
+- Patterns cobrem só 4 telas de referência (Login, Dashboard, Lista,
+  Formulário) — não é uma réplica pixel-perfect de cada tela do app, é
+  material de handoff.

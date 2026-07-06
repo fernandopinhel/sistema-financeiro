@@ -255,6 +255,28 @@ function tintIconInstance(instance, hex) {
   return instance;
 }
 
+// Looks up an existing master Component anywhere in the file by name (so
+// Patterns reuse whatever "Construir Components" already built instead of
+// creating duplicate masters), falling back to building a fresh one.
+function findComponentByName(name) {
+  return figma.root.findOne((n) => n.type === 'COMPONENT' && n.name === name);
+}
+
+async function getOrBuildInstance(name, builderFn) {
+  let master = findComponentByName(name);
+  if (!master) master = await builderFn();
+  return master.createInstance();
+}
+
+async function overrideInstanceText(instance, newText) {
+  const textNode = instance.findOne((n) => n.type === 'TEXT');
+  if (textNode) {
+    await figma.loadFontAsync(textNode.fontName);
+    textNode.characters = newText;
+  }
+  return instance;
+}
+
 async function drawAvatarCircle(size, initials) {
   await figma.loadFontAsync({ family: 'DM Mono', style: 'Medium' });
   const box = figma.createFrame();
@@ -1119,9 +1141,363 @@ async function buildComponentsPage() {
   figma.viewport.scrollAndZoomIntoView(page.children);
 }
 
+// ── Changelog ────────────────────────────────────────────────────────────
+// Copied from `git log --date=short --pretty=format:'%ad|%s' -- design-system/`
+// — update this array by hand whenever a token/component change lands.
+const CHANGELOG = [
+  {
+    date: '2026-07-06',
+    title: 'Plugin do Figma pra gerar Foundations e Components',
+    desc: 'Automatiza a criação dos Color/Text/Effect Styles e dos Components (Button, Input, Sidebar, Topbar, etc.) a partir dos tokens e do código real das views.',
+  },
+  {
+    date: '2026-07-06',
+    title: 'Unificação das cores duplicadas',
+    desc: 'Resolve as 3 inconsistências de cor (azul primário, verde de sucesso, vermelho de erro), sobrescrevendo as escalas indigo/red do Tailwind e realinhando --fp-success para emerald.',
+  },
+  {
+    date: '2026-07-01',
+    title: 'Proposta inicial do Design System',
+    desc: 'Estrutura de tokens (core/semantic/component) em Tokens Studio, hierarquia de componentes e roteiro de sincronização Figma ⇄ GitHub.',
+  },
+];
+
+async function buildChangelogPage() {
+  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
+  await figma.loadFontAsync({ family: 'DM Sans', style: 'Regular' });
+  await figma.loadFontAsync({ family: 'DM Sans', style: 'Bold' });
+  await figma.loadFontAsync({ family: 'DM Mono', style: 'Medium' });
+
+  // Figma's Starter plan caps files at 3 pages — Foundations/Components/
+  // Patterns already use all 3, so Changelog rides along as one more section
+  // at the bottom of Foundations instead of getting its own page.
+  let page = figma.root.children.find((p) => p.name === 'Changelog');
+  if (!page) page = figma.root.children.find((p) => p.name === 'Foundations');
+  if (!page) throw new Error('Rode "Construir Foundations" primeiro.');
+  figma.currentPage = page;
+  cursorY = page.children.reduce((max, n) => Math.max(max, n.y + n.height), 0) + 40;
+
+  const shell = sectionShell('Changelog');
+  shell.appendChild(await label('Changelog', { style: 'Bold', size: 20 }));
+  shell.appendChild(await label('Correlacionado com os commits que tocam design-system/ no GitHub', { size: 12, color: '#94A3B8' }));
+
+  for (const entry of CHANGELOG) {
+    const row = makeContainer('frame', `entry-${entry.date}-${entry.title}`, 'HORIZONTAL', { itemSpacing: 20 });
+
+    const dateLabel = await label(entry.date, { family: 'DM Mono', style: 'Medium', size: 12, color: '#94A3B8' });
+    dateLabel.textAutoResize = 'HEIGHT';
+    dateLabel.resize(90, dateLabel.height);
+    row.appendChild(dateLabel);
+
+    const textCol = makeContainer('frame', 'text', 'VERTICAL', { itemSpacing: 4 });
+    textCol.appendChild(await label(entry.title, { family: 'DM Sans', style: 'Bold', size: 14, color: '#1A1D2E' }));
+    const desc = await label(entry.desc, { family: 'DM Sans', style: 'Regular', size: 13, color: '#475569' });
+    desc.textAutoResize = 'HEIGHT';
+    desc.resize(560, desc.height);
+    textCol.appendChild(desc);
+    row.appendChild(textCol);
+
+    shell.appendChild(row);
+  }
+
+  positionSection(shell);
+  figma.viewport.scrollAndZoomIntoView(page.children);
+}
+
+// ── Patterns ─────────────────────────────────────────────────────────────
+
+async function buildStatCard(label_, amount, color, iconName) {
+  const card = makeContainer('frame', `stat-${label_}`, 'HORIZONTAL', {
+    width: 340, primarySizing: 'FIXED', counterSizing: 'AUTO',
+    primaryAlign: 'SPACE_BETWEEN', counterAlign: 'CENTER', padding: 20, cornerRadius: 16,
+    strokeColor: '#E4E7EE', strokeWeight: 1,
+    fills: [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }],
+  });
+
+  const textCol = makeContainer('frame', 'text', 'VERTICAL', { itemSpacing: 6 });
+  textCol.appendChild(await label(label_, { family: 'DM Sans', style: 'Medium', size: 13, color: '#64748B' }));
+  textCol.appendChild(await label(amount, { family: 'DM Sans', style: 'Bold', size: 22, color }));
+  card.appendChild(textCol);
+
+  const iconBox = makeContainer('frame', 'icon-box', 'HORIZONTAL', {
+    width: 48, height: 48, primarySizing: 'FIXED', counterSizing: 'FIXED',
+    primaryAlign: 'CENTER', counterAlign: 'CENTER', cornerRadius: 12,
+    fills: [{ type: 'SOLID', color: hexToRgb(color), opacity: 0.1 }],
+  });
+  const icon = getIconInstance(iconName, color);
+  icon.resize(20, 20);
+  iconBox.appendChild(icon);
+  card.appendChild(iconBox);
+
+  return card;
+}
+
+async function buildRadioCard(text, checked, color) {
+  const card = makeContainer('frame', `radio-${text}`, 'VERTICAL', {
+    itemSpacing: 4, padding: 16, cornerRadius: 12,
+    strokeColor: checked ? color : '#E4E7EE', strokeWeight: checked ? 2 : 1.5,
+    fills: [{ type: 'SOLID', color: hexToRgb(checked ? color : '#FFFFFF'), opacity: checked ? 0.08 : 1 }],
+  });
+  card.appendChild(await label(text, { family: 'DM Sans', style: 'Bold', size: 14, color: checked ? color : '#1A1D2E' }));
+  return card;
+}
+
+async function buildListRow(desc, category, isExpense, amount) {
+  const row = makeContainer('frame', 'row', 'HORIZONTAL', {
+    primarySizing: 'AUTO', counterSizing: 'AUTO', counterAlign: 'CENTER',
+    itemSpacing: 16, paddingX: 20, paddingY: 14, strokeColor: '#F1F5F9', strokeWeight: 0,
+  });
+  row.strokeBottomWeight = 1;
+  row.strokeTopWeight = 0;
+  row.strokeLeftWeight = 0;
+  row.strokeRightWeight = 0;
+
+  const descText = await label(desc, { family: 'DM Sans', style: 'Medium', size: 14, color: '#1A1D2E' });
+  descText.textAutoResize = 'HEIGHT';
+  descText.resize(280, descText.height);
+  row.appendChild(descText);
+
+  const catRow = makeContainer('frame', 'category', 'HORIZONTAL', { itemSpacing: 6, counterAlign: 'CENTER' });
+  catRow.appendChild(await getOrBuildInstance('ColorDot/default', () => buildColorDot()));
+  catRow.appendChild(await label(category, { family: 'DM Sans', style: 'Regular', size: 13, color: '#475569' }));
+  row.appendChild(catRow);
+
+  const typeBadge = makeContainer('frame', 'type', 'HORIZONTAL', {
+    paddingX: 10, paddingY: 4, cornerRadius: 9999,
+    fills: [{ type: 'SOLID', color: hexToRgb(isExpense ? '#FEF2F2' : '#ECFDF5') }],
+  });
+  typeBadge.appendChild(await label(isExpense ? 'Despesa' : 'Receita', { family: 'DM Sans', style: 'Bold', size: 12, color: isExpense ? '#E63946' : '#047857' }));
+  row.appendChild(typeBadge);
+
+  row.appendChild(await label(amount, { family: 'DM Sans', style: 'Bold', size: 14, color: isExpense ? '#E63946' : '#059669' }));
+
+  const actions = makeContainer('frame', 'actions', 'HORIZONTAL', { itemSpacing: 8 });
+  actions.appendChild(await getOrBuildInstance('IconButton/edit', () => buildIconButton('edit')));
+  actions.appendChild(await getOrBuildInstance('IconButton/duplicate', () => buildIconButton('duplicate')));
+  actions.appendChild(await getOrBuildInstance('IconButton/delete', () => buildIconButton('delete')));
+  row.appendChild(actions);
+
+  return row;
+}
+
+async function buildAppShell(pageTitle) {
+  const frame = makeContainer('frame', `Pattern/${pageTitle}`, 'HORIZONTAL', {
+    width: 1440, height: 900, primarySizing: 'FIXED', counterSizing: 'FIXED',
+    fills: [{ type: 'SOLID', color: hexToRgb('#F7F8FA') }],
+  });
+
+  const sidebar = await getOrBuildInstance('Sidebar/default', buildSidebar);
+  frame.appendChild(sidebar);
+
+  const main = makeContainer('frame', 'main', 'VERTICAL', {});
+  frame.appendChild(main);
+  main.layoutSizingHorizontal = 'FILL';
+  main.layoutSizingVertical = 'FILL';
+
+  const topbar = await getOrBuildInstance('Topbar/default', buildTopbar);
+  await overrideInstanceText(topbar, pageTitle);
+  main.appendChild(topbar);
+  topbar.layoutSizingHorizontal = 'FILL';
+
+  const content = makeContainer('frame', 'content', 'VERTICAL', { itemSpacing: 24, padding: 32 });
+  main.appendChild(content);
+  content.layoutSizingHorizontal = 'FILL';
+  content.layoutSizingVertical = 'FILL';
+
+  return { frame, content };
+}
+
+async function buildLoginPattern() {
+  const frame = makeContainer('frame', 'Pattern/Login', 'HORIZONTAL', {
+    width: 1440, height: 900, primarySizing: 'FIXED', counterSizing: 'FIXED',
+    primaryAlign: 'CENTER', counterAlign: 'CENTER',
+    fills: [{ type: 'SOLID', color: hexToRgb('#F7F8FA') }],
+  });
+
+  const card = makeContainer('frame', 'guest-card', 'VERTICAL', {
+    width: 440, primarySizing: 'FIXED', counterSizing: 'AUTO',
+    padding: 32, itemSpacing: 20, cornerRadius: 20,
+    strokeColor: '#E4E7EE', strokeWeight: 1,
+    fills: [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }],
+  });
+  card.effectStyleId = getOrCreateEffectStyle(SHADOWS.find((s) => s.name === 'card-elevated')).id;
+
+  const logoRow = makeContainer('frame', 'logo', 'HORIZONTAL', { counterAlign: 'CENTER', itemSpacing: 12 });
+  const logoBox = figma.createFrame();
+  logoBox.name = 'logo-icon';
+  logoBox.resize(44, 44);
+  logoBox.cornerRadius = 13;
+  logoBox.fills = [{ type: 'SOLID', color: hexToRgb('#4361EE') }];
+  logoRow.appendChild(logoBox);
+  logoRow.appendChild(await label('Finanças FP', { family: 'DM Sans', style: 'Bold', size: 20, color: '#1A1D2E' }));
+  card.appendChild(logoRow);
+
+  card.appendChild(await label('Bem-vindo de volta', { family: 'DM Sans', style: 'Bold', size: 18, color: '#1A1D2E' }));
+
+  for (const [labelText, placeholder] of [['E-mail', 'seu@email.com'], ['Senha', '••••••••']]) {
+    const field = makeContainer('frame', `field-${labelText}`, 'VERTICAL', { itemSpacing: 6 });
+    field.appendChild(await label(labelText, { family: 'DM Sans', style: 'Bold', size: 13, color: '#1A1D2E' }));
+    const input = await getOrBuildInstance('Input/default', () => buildInput('default'));
+    await overrideInstanceText(input, placeholder);
+    field.appendChild(input);
+    input.layoutSizingHorizontal = 'FILL';
+    card.appendChild(field);
+    field.layoutSizingHorizontal = 'FILL';
+  }
+
+  const submitBtn = await getOrBuildInstance('Button/primary/md/default', () => buildButton('primary', 'md', 'default'));
+  await overrideInstanceText(submitBtn, 'Entrar');
+  card.appendChild(submitBtn);
+  submitBtn.layoutSizingHorizontal = 'FILL';
+
+  const linkRow = makeContainer('frame', 'link-row', 'HORIZONTAL', { primaryAlign: 'CENTER' });
+  linkRow.appendChild(await getOrBuildInstance('Link/default', () => buildLink('default')));
+  card.appendChild(linkRow);
+  linkRow.layoutSizingHorizontal = 'FILL';
+
+  frame.appendChild(card);
+  return frame;
+}
+
+async function buildDashboardPattern() {
+  const { frame, content } = await buildAppShell('Dashboard');
+
+  content.appendChild(await label('Olá, Fernando Pinhel', { family: 'DM Sans', style: 'Bold', size: 22, color: '#1A1D2E' }));
+
+  const statsRow = makeContainer('frame', 'stats', 'HORIZONTAL', { itemSpacing: 20 });
+  statsRow.appendChild(await buildStatCard('Receitas', 'R$ 102.011,92', '#059669', 'arrow-income'));
+  statsRow.appendChild(await buildStatCard('Despesas', 'R$ 97.141,51', '#E63946', 'arrow-expense'));
+  statsRow.appendChild(await buildStatCard('Saldo Atual', 'R$ 4.870,41', '#4361EE', 'transactions'));
+  content.appendChild(statsRow);
+
+  const chartCard = makeContainer('frame', 'chart-card', 'VERTICAL', {
+    itemSpacing: 16, padding: 24, cornerRadius: 16, strokeColor: '#E4E7EE', strokeWeight: 1,
+    fills: [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }],
+  });
+  chartCard.appendChild(await label('Gastos por Mês (2026)', { family: 'DM Sans', style: 'Bold', size: 16, color: '#1A1D2E' }));
+  chartCard.appendChild(await getOrBuildInstance('Chart/bar-monthly', buildBarChart));
+  content.appendChild(chartCard);
+
+  return frame;
+}
+
+async function buildListPattern() {
+  const { frame, content } = await buildAppShell('Transações');
+
+  const headerRow = makeContainer('frame', 'header', 'HORIZONTAL', { primaryAlign: 'SPACE_BETWEEN', counterAlign: 'CENTER' });
+  headerRow.appendChild(await label('Histórico de Transações', { family: 'DM Sans', style: 'Bold', size: 20, color: '#1A1D2E' }));
+  const newBtn = await getOrBuildInstance('Button/primary/md/default', () => buildButton('primary', 'md', 'default'));
+  await overrideInstanceText(newBtn, '+ Nova Transação');
+  headerRow.appendChild(newBtn);
+  content.appendChild(headerRow);
+  headerRow.layoutSizingHorizontal = 'FILL';
+
+  const filterRow = makeContainer('frame', 'filters', 'HORIZONTAL', { itemSpacing: 12 });
+  const searchInput = await getOrBuildInstance('Input/default', () => buildInput('default'));
+  await overrideInstanceText(searchInput, 'Buscar por descrição...');
+  filterRow.appendChild(searchInput);
+  filterRow.appendChild(await getOrBuildInstance('Select/default', () => buildSelect('default')));
+  filterRow.appendChild(await getOrBuildInstance('Select/default', () => buildSelect('default')));
+  content.appendChild(filterRow);
+
+  const tableCard = makeContainer('frame', 'table', 'VERTICAL', {
+    cornerRadius: 16, strokeColor: '#E4E7EE', strokeWeight: 1,
+    fills: [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }],
+  });
+  const rows = [
+    ['IPTU', 'Apartamento', true, '- R$ 186,90'],
+    ['Cartão Bradesco/Nubank', 'Cartão', true, '- R$ 3.067,87'],
+    ['Saque Aniversário', 'Receita extra', false, '+ R$ 5.900,00'],
+    ['Celular', 'Vivo', true, '- R$ 82,44'],
+  ];
+  for (const [desc, cat, isExpense, amt] of rows) {
+    const row = await buildListRow(desc, cat, isExpense, amt);
+    tableCard.appendChild(row);
+    row.layoutSizingHorizontal = 'FILL';
+  }
+  content.appendChild(tableCard);
+  tableCard.layoutSizingHorizontal = 'FILL';
+
+  return frame;
+}
+
+async function buildFormPattern() {
+  const { frame, content } = await buildAppShell('Nova Transação');
+
+  const formCard = makeContainer('frame', 'form-card', 'VERTICAL', {
+    width: 600, primarySizing: 'FIXED', counterSizing: 'AUTO',
+    itemSpacing: 20, padding: 32, cornerRadius: 20, strokeColor: '#E4E7EE', strokeWeight: 1,
+    fills: [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }],
+  });
+  formCard.effectStyleId = getOrCreateEffectStyle(SHADOWS.find((s) => s.name === 'card')).id;
+
+  formCard.appendChild(await label('Nova Transação', { family: 'DM Sans', style: 'Bold', size: 18, color: '#1A1D2E' }));
+
+  const typeRow = makeContainer('frame', 'type-selector', 'HORIZONTAL', { itemSpacing: 12 });
+  const incomeCard = await buildRadioCard('Receita', true, '#059669');
+  const expenseCard = await buildRadioCard('Despesa', false, '#E63946');
+  typeRow.appendChild(incomeCard);
+  incomeCard.layoutSizingHorizontal = 'FILL';
+  typeRow.appendChild(expenseCard);
+  expenseCard.layoutSizingHorizontal = 'FILL';
+  formCard.appendChild(typeRow);
+  typeRow.layoutSizingHorizontal = 'FILL';
+
+  for (const [labelText, placeholder] of [['Descrição', 'Ex: Supermercado'], ['Valor', 'R$ 0,00'], ['Data', '10/07/2026']]) {
+    const field = makeContainer('frame', `field-${labelText}`, 'VERTICAL', { itemSpacing: 6 });
+    field.appendChild(await label(labelText, { family: 'DM Sans', style: 'Bold', size: 13, color: '#1A1D2E' }));
+    const input = await getOrBuildInstance('Input/default', () => buildInput('default'));
+    await overrideInstanceText(input, placeholder);
+    field.appendChild(input);
+    input.layoutSizingHorizontal = 'FILL';
+    formCard.appendChild(field);
+    field.layoutSizingHorizontal = 'FILL';
+  }
+
+  const actionsRow = makeContainer('frame', 'actions', 'HORIZONTAL', { itemSpacing: 12, primaryAlign: 'MAX' });
+  const cancelBtn = await getOrBuildInstance('Button/ghost/md/default', () => buildButton('ghost', 'md', 'default'));
+  await overrideInstanceText(cancelBtn, 'Cancelar');
+  const saveBtn = await getOrBuildInstance('Button/primary/md/default', () => buildButton('primary', 'md', 'default'));
+  await overrideInstanceText(saveBtn, 'Salvar');
+  actionsRow.appendChild(cancelBtn);
+  actionsRow.appendChild(saveBtn);
+  formCard.appendChild(actionsRow);
+  actionsRow.layoutSizingHorizontal = 'FILL';
+
+  content.appendChild(formCard);
+  formCard.layoutSizingHorizontal = 'FILL';
+
+  return frame;
+}
+
+async function buildPatternsPage() {
+  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
+  await figma.loadFontAsync({ family: 'DM Sans', style: 'Regular' });
+  await figma.loadFontAsync({ family: 'DM Sans', style: 'Medium' });
+  await figma.loadFontAsync({ family: 'DM Sans', style: 'Bold' });
+  await figma.loadFontAsync({ family: 'DM Mono', style: 'Medium' });
+
+  let page = figma.root.children.find((p) => p.name === 'Patterns');
+  if (!page) {
+    page = figma.createPage();
+    page.name = 'Patterns';
+  }
+  figma.currentPage = page;
+  cursorY = 0;
+
+  positionSection(await buildLoginPattern());
+  positionSection(await buildDashboardPattern());
+  positionSection(await buildListPattern());
+  positionSection(await buildFormPattern());
+
+  figma.viewport.scrollAndZoomIntoView(page.children);
+}
+
 // ── Entry point ──────────────────────────────────────────────────────────
 
-figma.showUI(__html__, { width: 260, height: 160 });
+figma.showUI(__html__, { width: 260, height: 260 });
 
 figma.ui.onmessage = async (msg) => {
   try {
@@ -1131,6 +1507,12 @@ figma.ui.onmessage = async (msg) => {
     } else if (msg.type === 'build-components') {
       await buildComponentsPage();
       figma.notify('Página Components construída ✅');
+    } else if (msg.type === 'build-patterns') {
+      await buildPatternsPage();
+      figma.notify('Página Patterns construída ✅');
+    } else if (msg.type === 'build-changelog') {
+      await buildChangelogPage();
+      figma.notify('Página Changelog construída ✅');
     }
   } catch (e) {
     console.error(e);
