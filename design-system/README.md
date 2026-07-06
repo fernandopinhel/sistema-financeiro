@@ -38,7 +38,7 @@ Para cada componente, incluir:
 
 Ver `FIGMA_SYNC_ROADMAP.md` para o passo a passo técnico completo. Resumo da ordem recomendada:
 
-1. Resolver as 3 inconsistências de cor no código (Fase 0).
+1. ~~Resolver as 3 inconsistências de cor no código (Fase 0).~~ **Feito.**
 2. Importar `tokens/` no Tokens Studio e configurar o tema `fp-light` (Fase 1-2).
 3. Conectar o Sync com GitHub na branch `design-tokens` (Fase 3).
 4. Montar o pipeline Style Dictionary → CSS/Tailwind (Fase 4).

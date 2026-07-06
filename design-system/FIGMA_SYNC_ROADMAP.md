@@ -14,9 +14,9 @@ O JSON em `design-system/tokens/` é a fonte da verdade. Tanto o design (via plu
 
 Antes de importar qualquer coisa no Figma, resolver as 3 inconsistências listadas em `COMPONENT_HIERARCHY.md` (azul/verde/vermelho duplicados). Se isso não for feito antes, o Figma vai herdar a bagunça e a sincronização vai "engessar" dois azuis diferentes como se fossem intencionais.
 
-- [ ] Decidir cor primária única (recomendado: `#4361EE`, já é a cor de marca/logo)
-- [ ] Decidir verde de sucesso único (recomendado: `emerald`, já é o mais usado nas views)
-- [ ] Decidir vermelho de erro único (recomendado: manter `#E63946`, mas aplicar via token em vez de `red-*` cru)
+- [x] Decidir cor primária única (`#4361EE`) — aplicada sobrescrevendo a escala `indigo` do Tailwind em `tailwind.config.js`
+- [x] Decidir verde de sucesso único (`emerald`) — `--fp-success`/`.fp-alert-success` realinhados em `resources/css/app.css`
+- [x] Decidir vermelho de erro único (`#E63946`) — aplicado sobrescrevendo a escala `red` do Tailwind em `tailwind.config.js`
 
 ## Fase 1 — Estrutura de pastas (já criada neste repositório)
 

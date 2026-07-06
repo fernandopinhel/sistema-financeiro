@@ -7,14 +7,6 @@
     "500": { "value": "#4361EE", "type": "color" },
     "600": { "value": "#3451D1", "type": "color" }
   },
-  "indigo": {
-    "50":  { "value": "#EEF2FF", "type": "color" },
-    "100": { "value": "#E0E7FF", "type": "color" },
-    "400": { "value": "#818CF8", "type": "color" },
-    "500": { "value": "#6366F1", "type": "color" },
-    "600": { "value": "#4F46E5", "type": "color" },
-    "700": { "value": "#4338CA", "type": "color" }
-  },
   "slate": {
     "50":  { "value": "#F8FAFC", "type": "color" },
     "100": { "value": "#F1F5F9", "type": "color" },
@@ -37,18 +29,13 @@
   "red": {
     "50":  { "value": "#FEF2F2", "type": "color" },
     "100": { "value": "#FEE2E2", "type": "color" },
-    "400": { "value": "#F87171", "type": "color" },
-    "500": { "value": "#EF4444", "type": "color" },
-    "600": { "value": "#DC2626", "type": "color" }
+    "400": { "value": "#ED6873", "type": "color" },
+    "500": { "value": "#E63946", "type": "color" },
+    "600": { "value": "#E63946", "type": "color" },
+    "700": { "value": "#C42430", "type": "color" }
   },
   "amber": {
     "400": { "value": "#F4A261", "type": "color" }
-  },
-  "teal": {
-    "500": { "value": "#2EC4B6", "type": "color" }
-  },
-  "brand-danger": {
-    "500": { "value": "#E63946", "type": "color" }
   },
   "brand-ink": {
     "900": { "value": "#1A1D2E", "type": "color" }

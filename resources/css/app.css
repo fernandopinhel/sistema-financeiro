@@ -14,7 +14,7 @@
     --fp-border:    #E4E7EE;
     --fp-accent:    #4361EE;
     --fp-accent-h:  #3451D1;
-    --fp-success:   #2EC4B6;
+    --fp-success:   #059669;
     --fp-danger:    #E63946;
     --fp-warning:   #F4A261;
     --fp-text:      #1A1D2E;
@@ -293,8 +293,8 @@ body {
     display: flex; align-items: center; gap: 8px;
 }
 .fp-alert-success {
-    background: rgba(46,196,182,.1); color: #0D9488;
-    border: 1px solid rgba(46,196,182,.25);
+    background: #ECFDF5; color: #047857;
+    border: 1px solid #A7F3D0;
 }
 .fp-alert-error {
     background: rgba(230,57,70,.08); color: var(--fp-danger);
@@ -358,7 +358,7 @@ body {
     box-shadow: 0 4px 32px rgba(26,29,46,.08);
 }
 
-.fp-link-sm, .fp-link{color: rgb(79 70 229);}
+.fp-link-sm, .fp-link{color: var(--fp-accent);}
 
 @media (max-width: 480px) {
     .fp-guest-card { padding: 28px 20px; border-radius: 16px; }

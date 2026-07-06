@@ -28,13 +28,13 @@
   },
   "feedback": {
     "success": {
-      "default": { "value": "{teal.500}",   "type": "color" },
+      "default": { "value": "{emerald.600}", "type": "color" },
       "bg":      { "value": "{emerald.50}", "type": "color" },
       "text":    { "value": "{emerald.700}","type": "color" },
       "border":  { "value": "{emerald.100}","type": "color" }
     },
     "danger": {
-      "default": { "value": "{brand-danger.500}", "type": "color" },
+      "default": { "value": "{red.500}", "type": "color" },
       "bg":      { "value": "{red.50}",  "type": "color" },
       "text":    { "value": "{red.600}", "type": "color" },
       "border":  { "value": "{red.100}", "type": "color" }
