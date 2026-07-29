@@ -167,6 +167,44 @@
         </form>
     </div>
 
+    {{-- ── Face ID / Biometria ── --}}
+    <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 16px; font-weight: 700; color: var(--fp-text); margin: 0 0 4px;">Face ID / Biometria</h2>
+        <p style="font-size: 13px; color: var(--fp-muted); margin: 0 0 20px;">
+            Cadastre este dispositivo pra entrar com Face ID, Touch ID ou biometria — sem digitar senha. É opcional: sua senha continua funcionando normalmente.
+        </p>
+
+        @if($passkeys->isEmpty())
+            <p id="passkey-empty-msg" style="font-size: 13px; color: var(--fp-muted); margin: 0 0 16px;">Nenhum dispositivo cadastrado ainda.</p>
+        @else
+            <ul id="passkey-list" style="list-style:none; margin:0 0 16px; padding:0; display:flex; flex-direction:column; gap:8px;">
+                @foreach($passkeys as $passkey)
+                    <li id="passkey-row-{{ $passkey->id }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; background:#F9FAFB; border:1.5px solid var(--fp-border); border-radius:10px; padding:10px 14px;">
+                        <div>
+                            <p style="font-size:14px; font-weight:600; color:var(--fp-text); margin:0;">{{ $passkey->name }}</p>
+                            <p style="font-size:12px; color:var(--fp-muted); margin:2px 0 0;">
+                                {{ $passkey->last_used_at ? 'Usada em ' . $passkey->last_used_at->timezone('America/Sao_Paulo')->format('d/m/Y \à\s H:i') : 'Nunca usada' }}
+                            </p>
+                        </div>
+                        <button type="button" class="fp-btn fp-btn-ghost fp-btn-sm" onclick="fpDeletePasskey({{ $passkey->id }}, {{ \Illuminate\Support\Js::from($passkey->name) }})">
+                            Remover
+                        </button>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+
+        <button type="button" id="passkey-add-btn" class="fp-btn fp-btn-secondary fp-btn-sm" onclick="fpRegisterPasskey()" hidden>
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+            </svg>
+            Adicionar este dispositivo
+        </button>
+        <p id="passkey-unsupported-msg" style="font-size: 12px; color: var(--fp-muted); margin: 8px 0 0;" hidden>
+            Este navegador/dispositivo não suporta Face ID ou biometria. Você ainda pode gerenciar passkeys cadastradas em outros aparelhos aqui.
+        </p>
+    </div>
+
     {{-- ── Sair da conta ── --}}
     <div style="margin-bottom: 20px;">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
@@ -247,6 +285,36 @@
     </div>
 </dialog>
 
+{{-- Modal de confirmação de remoção de passkey --}}
+<dialog id="passkeyRemoveModal" style="border:none;border-radius:16px;padding:0;box-shadow:0 20px 60px rgba(0,0,0,.2);max-width:420px;width:90vw;">
+    <div style="padding:28px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(230,57,70,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#E63946">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                </svg>
+            </div>
+            <h3 style="font-size:17px;font-weight:700;color:var(--fp-text);margin:0;">Remover dispositivo</h3>
+        </div>
+
+        <p style="font-size:13px;color:var(--fp-muted);line-height:1.6;margin:0 0 20px;">
+            Remover "<strong id="passkeyRemoveModalName"></strong>"? Você não vai mais conseguir entrar com Face ID/biometria usando esse dispositivo — sua senha continua funcionando normalmente.
+        </p>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button type="button" class="fp-btn fp-btn-ghost fp-btn-sm"
+                    onclick="document.getElementById('passkeyRemoveModal').close()">
+                Cancelar
+            </button>
+            <button type="button" class="fp-btn fp-btn-sm"
+                    style="background:var(--fp-danger);color:#fff;"
+                    onclick="fpConfirmDeletePasskey()">
+                Sim, remover
+            </button>
+        </div>
+    </div>
+</dialog>
+
 <style>
     dialog::backdrop { background: rgba(0,0,0,.4); }
     .fp-label { display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:6px; letter-spacing:.02em; text-transform:uppercase; }
@@ -254,5 +322,115 @@
     .fp-input:focus { border-color:var(--fp-accent); background:#fff; box-shadow:0 0 0 3px rgba(67,97,238,.12); }
     .fp-input.error { border-color:var(--fp-danger); }
 </style>
+
+@push('scripts')
+<script>
+(function () {
+    'use strict';
+
+    // window.FpPasskeys vem de resources/js/app.js (módulo, carregado no
+    // head deste layout) — já disponível aqui porque este script roda no
+    // stack de scripts, no fim do body, depois do módulo.
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var addBtn = document.getElementById('passkey-add-btn');
+        var unsupportedMsg = document.getElementById('passkey-unsupported-msg');
+        if (!addBtn || !window.FpPasskeys) return;
+
+        var FP = window.FpPasskeys;
+        var supportsPlatformAuth = window.PublicKeyCredential &&
+            typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function';
+
+        if (FP.Passkeys.isSupported() && supportsPlatformAuth) {
+            PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(function (available) {
+                if (available) addBtn.removeAttribute('hidden');
+                else if (unsupportedMsg) unsupportedMsg.removeAttribute('hidden');
+            }).catch(function () {
+                if (unsupportedMsg) unsupportedMsg.removeAttribute('hidden');
+            });
+        } else if (unsupportedMsg) {
+            unsupportedMsg.removeAttribute('hidden');
+        }
+    });
+
+    function csrfToken() {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
+
+    function goConfirmPassword() {
+        window.location.href = '{{ route('password.confirm') }}';
+    }
+
+    window.fpRegisterPasskey = function () {
+        var name = window.prompt('Dê um nome pra esse dispositivo (ex.: "iPhone do Fernando"):', '');
+        if (!name) return;
+
+        var btn = document.getElementById('passkey-add-btn');
+        btn.disabled = true;
+
+        window.FpPasskeys.Passkeys.register({ name: name })
+            .then(function () {
+                window.location.reload();
+            })
+            .catch(function (err) {
+                btn.disabled = false;
+
+                if (err instanceof window.FpPasskeys.UserCancelledError) return;
+
+                if (err && typeof err.message === 'string' && err.message.indexOf('Password confirmation') !== -1) {
+                    goConfirmPassword();
+                    return;
+                }
+
+                window.alert(window.FpPasskeys.translateError(err));
+            });
+    };
+
+    var pendingPasskeyDeleteId = null;
+
+    window.fpDeletePasskey = function (id, name) {
+        pendingPasskeyDeleteId = id;
+        document.getElementById('passkeyRemoveModalName').textContent = name;
+        document.getElementById('passkeyRemoveModal').showModal();
+    };
+
+    window.fpConfirmDeletePasskey = function () {
+        var id = pendingPasskeyDeleteId;
+        document.getElementById('passkeyRemoveModal').close();
+        if (!id) return;
+
+        fetch('/user/passkeys/' + id, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken(),
+                'Accept': 'application/json',
+            },
+        }).then(function (res) {
+            if (res.status === 423) {
+                goConfirmPassword();
+                return;
+            }
+            if (!res.ok) throw new Error('Falha ao remover.');
+
+            var row = document.getElementById('passkey-row-' + id);
+            if (row) row.remove();
+
+            var list = document.getElementById('passkey-list');
+            if (list && !list.children.length) {
+                var empty = document.createElement('p');
+                empty.id = 'passkey-empty-msg';
+                empty.style.cssText = 'font-size:13px;color:var(--fp-muted);margin:0 0 16px;';
+                empty.textContent = 'Nenhum dispositivo cadastrado ainda.';
+                list.replaceWith(empty);
+            }
+        }).catch(function () {
+            window.alert('Não foi possível remover a passkey. Tente novamente.');
+        });
+    };
+
+})();
+</script>
+@endpush
 
 @endsection

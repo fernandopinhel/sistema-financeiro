@@ -80,6 +80,25 @@
             body { padding: 16px; }
             .no-print { display: none !important; }
         }
+
+        {{-- Só afeta a visualização em tela (antes de imprimir/salvar) — o
+             layout impresso/PDF acima continua igual, pensado pra página A4. --}}
+        @media screen and (max-width: 640px) {
+            body { padding: 16px; font-size: 12px; }
+
+            .no-print { flex-wrap: wrap; }
+            .btn { width: 100%; text-align: center; }
+
+            .header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .header-right { text-align: left; }
+
+            .summary { flex-direction: column; gap: 10px; }
+
+            .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -16px; padding: 0 16px; }
+            table { min-width: 560px; }
+
+            .footer { flex-direction: column; gap: 4px; }
+        }
     </style>
 </head>
 <body>
@@ -115,6 +134,7 @@
     </div>
 </div>
 
+<div class="table-wrap">
 <table>
     <thead>
         <tr>
@@ -153,6 +173,7 @@
         @endforelse
     </tbody>
 </table>
+</div>
 
 <div class="footer">
     <span>{{ config('app.name', 'Finanças') }} — Relatório gerado automaticamente</span>

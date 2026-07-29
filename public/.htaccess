@@ -1,3 +1,15 @@
+<IfModule mod_headers.c>
+    # O sw.js é gerado dentro de /build/, mas precisa controlar o site
+    # inteiro (scope "/"). Sem esse header o navegador restringe o
+    # service worker ao próprio diretório (/build/) e a instalação do
+    # PWA falha. Cache-Control garante que o browser sempre revalide
+    # o sw.js em vez de servir uma versão antiga em cache.
+    <FilesMatch "^sw\.js$">
+        Header set Service-Worker-Allowed "/"
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

@@ -12,10 +12,10 @@
     </div>
 
     {{-- Filtros + Exportação --}}
-    <div class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
 
         {{-- Select Ano — customizado com seta correta --}}
-        <div class="relative">
+        <div class="relative flex-1 min-w-[90px] sm:flex-none sm:min-w-0">
             <select id="select-ano" class="fp-select fp-select-sm">
                 @foreach($anosDisponiveis as $a)
                     <option value="{{ $a }}" {{ (string)$ano === (string)$a ? 'selected' : '' }}>{{ $a }}</option>
@@ -24,7 +24,7 @@
         </div>
 
         {{-- Select Mês --}}
-        <div class="relative">
+        <div class="relative flex-1 min-w-[130px] sm:flex-none sm:min-w-0">
             <select id="select-mes" class="fp-select fp-select-sm">
                 <option value="">Todos os Meses</option>
                 @php
@@ -43,9 +43,11 @@
         {{-- Export Excel --}}
         <a id="btn-excel"
            href="{{ route('transacoes.export.excel', ['ano' => $ano, 'mes' => request('mes')]) }}"
-           class="inline-flex items-center gap-1.5 text-sm px-3 py-2 bg-emerald-600 hover:bg-emerald-700
-                  text-white rounded-xl shadow-sm font-semibold transition-all">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+           target="_blank"
+           rel="noopener noreferrer"
+           class="inline-flex items-center justify-center gap-1.5 text-sm px-3 py-2 bg-emerald-600 hover:bg-emerald-700
+                  text-white rounded-xl shadow-sm font-semibold transition-all whitespace-nowrap flex-shrink-0">
+            <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
             Excel
@@ -56,9 +58,9 @@
            href="{{ route('transacoes.export.pdf', ['ano' => $ano, 'mes' => request('mes')]) }}"
            target="_blank"
            rel="noopener noreferrer"
-           class="inline-flex items-center gap-1.5 text-sm px-3 py-2 bg-rose-600 hover:bg-rose-700
-                  text-white rounded-xl shadow-sm font-semibold transition-all">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+           class="inline-flex items-center justify-center gap-1.5 text-sm px-3 py-2 bg-rose-600 hover:bg-rose-700
+                  text-white rounded-xl shadow-sm font-semibold transition-all whitespace-nowrap flex-shrink-0">
+            <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
             PDF
@@ -67,17 +69,22 @@
 </div>
 
 {{-- Grid de Cards Contadores --}}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6 md:mb-8">
+<div id="dashboard-cards-grid"
+     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6 md:mb-8"
+     x-data="{}"
+     x-sort="window.FpDashboard.onCardsSort()"
+     x-sort.ghost>
 
     {{-- Receitas --}}
-    <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between">
-        <div>
+    <div data-card-key="receitas" x-sort:item="receitas"
+         class="fp-draggable bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
+        <div class="min-w-0">
             <p class="text-sm font-medium text-slate-500 mb-1">Receitas</p>
-            <h4 id="card-receitas" class="text-xl md:text-2xl font-bold text-emerald-600">
+            <h4 id="card-receitas" class="text-xl md:text-2xl font-bold text-emerald-600 whitespace-nowrap">
                 R$ {{ number_format($receitas, 2, ',', '.') }}
             </h4>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100/50 flex items-center justify-center p-3 text-emerald-600">
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100/50 flex items-center justify-center p-3 text-emerald-600 flex-shrink-0">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
             </svg>
@@ -85,14 +92,15 @@
     </div>
 
     {{-- Despesas --}}
-    <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between">
-        <div>
+    <div data-card-key="despesas" x-sort:item="despesas"
+         class="fp-draggable bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
+        <div class="min-w-0">
             <p class="text-sm font-medium text-slate-500 mb-1">Despesas</p>
-            <h4 id="card-despesas" class="text-xl md:text-2xl font-bold text-rose-600">
+            <h4 id="card-despesas" class="text-xl md:text-2xl font-bold text-rose-600 whitespace-nowrap">
                 R$ {{ number_format($despesas, 2, ',', '.') }}
             </h4>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-100/50 flex items-center justify-center p-3 text-rose-600">
+        <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-100/50 flex items-center justify-center p-3 text-rose-600 flex-shrink-0">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"/>
             </svg>
@@ -100,14 +108,15 @@
     </div>
 
     {{-- Saldo --}}
-    <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between">
-        <div>
+    <div data-card-key="saldo" x-sort:item="saldo"
+         class="fp-draggable bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
+        <div class="min-w-0">
             <p class="text-sm font-medium text-slate-500 mb-1">Saldo Atual</p>
-            <h4 id="card-saldo" class="text-xl md:text-2xl font-bold {{ $saldo >= 0 ? 'text-indigo-600' : 'text-rose-700' }}">
+            <h4 id="card-saldo" class="text-xl md:text-2xl font-bold whitespace-nowrap {{ $saldo >= 0 ? 'text-indigo-600' : 'text-rose-700' }}">
                 R$ {{ number_format($saldo, 2, ',', '.') }}
             </h4>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100/50 flex items-center justify-center p-3 text-indigo-600">
+        <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100/50 flex items-center justify-center p-3 text-indigo-600 flex-shrink-0">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
@@ -115,26 +124,50 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div id="dashboard-blocks-grid"
+     class="grid grid-cols-1 lg:grid-cols-3 gap-6"
+     x-data="{}"
+     x-sort="window.FpDashboard.onBlocksSort()"
+     x-sort.ghost>
 
     {{-- Gráfico --}}
-    <div class="lg:col-span-2 bg-white border border-slate-100 rounded-2xl shadow-sm p-5">
-        <h3 id="titulo-grafico" class="text-base font-bold text-slate-800 mb-4">
-            Gastos por Mês ({{ $ano }})
-        </h3>
+    <div data-card-key="grafico" x-sort:item="grafico"
+         class="lg:col-span-2 bg-white border border-slate-100 rounded-2xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h3 id="titulo-grafico" class="text-base font-bold text-slate-800">
+                Gastos por Mês ({{ $ano }})
+            </h3>
+            <span x-sort:handle class="fp-drag-handle" title="Arrastar para reordenar" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
+                    <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
+                    <circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/>
+                </svg>
+            </span>
+        </div>
         <div class="h-[300px] relative">
             <canvas id="grafico-gastos" aria-label="Gráfico de gastos mensais" role="img"></canvas>
         </div>
     </div>
 
     {{-- Categorias com filtro de busca --}}
-    <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex flex-col">
+    <div data-card-key="categorias" x-sort:item="categorias"
+         class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex flex-col">
         <div class="flex items-center justify-between mb-3">
             <h3 class="text-base font-bold text-slate-800">Categorias</h3>
-            <span id="total-geral-badge"
-                  class="text-sm font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl">
-                Total: R$ {{ number_format($totalGeral, 2, ',', '.') }}
-            </span>
+            <div class="flex items-center gap-2">
+                <span id="total-geral-badge"
+                      class="text-sm font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl">
+                    Total: R$ {{ number_format($totalGeral, 2, ',', '.') }}
+                </span>
+                <span x-sort:handle class="fp-drag-handle" title="Arrastar para reordenar" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
+                        <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
+                        <circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/>
+                    </svg>
+                </span>
+            </div>
         </div>
 
         {{-- Filtro de busca por categoria --}}
@@ -178,6 +211,23 @@
 @include('components.cookie-banner')
 
 @push('scripts')
+<style>
+/* Dashboard arrastável — affordance visual de drag-and-drop (@alpinejs/sort) */
+.fp-draggable { cursor: grab; }
+.fp-draggable:active { cursor: grabbing; }
+
+.fp-drag-handle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+    color: #9ca3af; cursor: grab;
+    transition: background-color .15s, color .15s;
+}
+.fp-drag-handle:hover { background: #f3f4f6; color: #4b5563; }
+.fp-drag-handle:active { cursor: grabbing; }
+
+/* Placeholder deixado pelo x-sort.ghost no lugar durante o arraste */
+.sortable-ghost { opacity: .4; }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function () {
@@ -296,7 +346,7 @@
 
                 const cardSaldo = document.getElementById('card-saldo');
                 cardSaldo.textContent = formatarMoeda(data.saldo);
-                cardSaldo.className = 'text-xl md:text-2xl font-bold ' +
+                cardSaldo.className = 'text-xl md:text-2xl font-bold whitespace-nowrap ' +
                     (data.saldo >= 0 ? 'text-indigo-600' : 'text-rose-700');
 
                 document.getElementById('total-geral-badge').textContent =
@@ -355,7 +405,12 @@
         selectMes.addEventListener('change', gerenciarFiltros);
         filtroCat.addEventListener('input', aplicarFiltroCat);
 
-        // PDF sempre em nova aba (garante mesmo se o href for atualizado via JS)
+        // Excel e PDF sempre em nova aba/contexto — essencial no PWA instalado:
+        // sem isso, o download navega a janela do app inteira pra uma URL de
+        // download, e como o PWA standalone não tem barra de navegador/botão
+        // voltar, o usuário fica preso sem como retornar ao sistema.
+        btnExcel.setAttribute('target', '_blank');
+        btnExcel.setAttribute('rel', 'noopener noreferrer');
         btnPdf.setAttribute('target', '_blank');
         btnPdf.setAttribute('rel', 'noopener noreferrer');
     });

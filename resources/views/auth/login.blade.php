@@ -144,6 +144,27 @@
             Entrar com Google
         </a>
 
+        {{-- Login com Face ID / Biometria — só aparece se o dispositivo suportar --}}
+        <div class="relative">
+            <button
+                type="button"
+                id="passkey-login-btn"
+                class="fp-btn-google js-track-passkey-login"
+                data-testid="btn-passkey-login"
+                aria-label="Entrar com Face ID ou biometria"
+                hidden
+            >
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+                </svg>
+                <span id="passkey-login-btn-label">Entrar com Face ID / Biometria</span>
+            </button>
+            {{-- Posicionado como balão flutuante — não empurra o resto do formulário --}}
+            <p id="passkey-login-err"
+               class="fp-field-error fp-field-error-floating"
+               role="alert" hidden></p>
+        </div>
+
         {{-- reCAPTCHA --}}
         <div>
             <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.key') }}" data-testid="recaptcha"></div>
@@ -192,6 +213,24 @@
     color: var(--fp-danger);
 }
 .fp-field-error svg { color: var(--fp-danger); flex-shrink: 0; }
+
+/* Balão flutuante do erro de passkey — sai do fluxo do documento de
+   propósito, pra não empurrar/redimensionar o card de login quando
+   aparece ou some. */
+.fp-field-error-floating {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 5;
+    margin-top: 0;
+    padding: 8px 12px;
+    background: var(--fp-surface);
+    border: 1px solid rgba(230,57,70,.25);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.08);
+    line-height: 1.4;
+}
 
 /* Botão toggle de senha */
 .fp-input-icon--has-toggle .fp-input { padding-right: 40px; }
@@ -389,6 +428,64 @@ input:-webkit-autofill:focus {
             }
         });
     }
+
+    /* ── Passkey / Face ID / Biometria ──────────────────────────────
+       window.FpPasskeys é definido em resources/js/app.js, que é um
+       módulo (type="module") e por isso só termina de rodar perto do
+       DOMContentLoaded — mais tarde do que este script inline no fim
+       do body. Por isso a lógica de passkey fica presa a esse evento. */
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn      = document.getElementById('passkey-login-btn');
+        var btnLabel = document.getElementById('passkey-login-btn-label');
+        var errEl    = document.getElementById('passkey-login-err');
+        if (!btn || !window.FpPasskeys) return;
+
+        var FP = window.FpPasskeys;
+
+        function showPasskeyError(msg) {
+            errEl.innerHTML = ERR_ICON + msg;
+            errEl.removeAttribute('hidden');
+        }
+
+        function clearPasskeyError() {
+            errEl.innerHTML = '';
+            errEl.setAttribute('hidden', '');
+        }
+
+        // Só mostra o botão se o navegador suportar WebAuthn E o dispositivo
+        // tiver um autenticador de plataforma (Face ID/Touch ID/biometria/
+        // Windows Hello) — evita mostrar um botão inútil em desktops sem
+        // biometria (o WebAuthn ainda funcionaria com chave USB, mas a
+        // proposta aqui é especificamente Face ID/biometria).
+        var supportsPlatformAuth = window.PublicKeyCredential &&
+            typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function';
+
+        if (FP.Passkeys.isSupported() && supportsPlatformAuth) {
+            PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(function (available) {
+                if (available) btn.removeAttribute('hidden');
+            }).catch(function () { /* mantém oculto */ });
+        }
+
+        btn.addEventListener('click', function () {
+            clearPasskeyError();
+            btn.disabled = true;
+            btnLabel.textContent = 'Verificando...';
+
+            FP.Passkeys.verify()
+                .then(function (response) {
+                    window.location.href = response.redirect || '/dashboard';
+                })
+                .catch(function (err) {
+                    btn.disabled = false;
+                    btnLabel.textContent = 'Entrar com Face ID / Biometria';
+
+                    // Cancelamento do usuário não é um erro — só volta ao normal.
+                    if (err instanceof FP.UserCancelledError) return;
+
+                    showPasskeyError(FP.translateError(err));
+                });
+        });
+    });
 
 })();
 </script>

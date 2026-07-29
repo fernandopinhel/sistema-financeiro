@@ -11,6 +11,9 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
+    {{-- PWA --}}
+    @include('partials.pwa-head')
+
     {{-- Fontes --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -187,14 +190,6 @@
                 </svg>
                 Recorrentes
             </a>
-
-            <a href="{{ route('privacidade') }}"
-               class="{{ request()->routeIs('privacidade') ? 'active' : '' }}">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
-                </svg>
-                Privacidade
-            </a>
         </nav>
 
         {{-- User menu --}}
@@ -242,6 +237,16 @@
                     </svg>
                     Privacidade & Cookies
                 </a>
+                <button type="button" role="menuitem"
+                        x-data="{}"
+                        x-show="$store.pwaInstall.available"
+                        x-cloak
+                        @click="$store.pwaInstall.install()">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                    </svg>
+                    Instalar App
+                </button>
                 <hr>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -301,6 +306,32 @@
 
     {{-- Banner de cookies --}}
     @include('components.cookie-banner')
+
+    {{-- Instruções de instalação do PWA no iOS (não há prompt nativo — só
+         manual via Compartilhar). Acionado pelo item "Instalar App" do menu
+         do usuário quando `$store.pwaInstall.mode === 'ios'`. --}}
+    <dialog id="pwa-ios-instructions-modal"
+            style="border:none;border-radius:16px;padding:0;box-shadow:0 20px 60px rgba(0,0,0,.2);max-width:360px;width:90vw;">
+        <div style="padding:24px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                <img src="{{ asset('icons/icon-192.png') }}" alt="" width="36" height="36" style="border-radius:10px;flex-shrink:0;">
+                <h3 style="font-size:16px;font-weight:700;color:var(--fp-text);margin:0;">Instalar Finanças FP</h3>
+            </div>
+            <p style="font-size:13px;color:var(--fp-muted);line-height:1.6;margin:0 0 20px;">
+                Toque em
+                <svg style="display:inline;width:14px;height:14px;vertical-align:-2px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0-12l-4 4m4-4l4 4M5 15v4a2 2 0 002 2h10a2 2 0 002-2v-4"/>
+                </svg>
+                <strong>Compartilhar</strong> e depois em <strong>"Adicionar à Tela de Início"</strong>.
+            </p>
+            <div style="display:flex;justify-content:flex-end;">
+                <button type="button" class="fp-btn fp-btn-secondary fp-btn-sm"
+                        onclick="document.getElementById('pwa-ios-instructions-modal').close()">
+                    Entendi
+                </button>
+            </div>
+        </div>
+    </dialog>
 
     <script>
     (function () {
