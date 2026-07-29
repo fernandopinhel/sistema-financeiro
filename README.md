@@ -8,12 +8,13 @@
 
 O **Finanças FP** é uma aplicação web construída com Laravel 12 + Alpine.js que permite ao usuário registrar e acompanhar suas finanças pessoais de forma simples e visual. O sistema inclui:
 
-- Dashboard com gráfico de gastos mensais e cards de resumo
+- Dashboard com gráfico de gastos mensais e cards de resumo, **arrastáveis** (drag-and-drop) pra cada usuário organizar do seu jeito
 - CRUD completo de transações (receitas e despesas)
 - Categorias com cores personalizáveis e indicador de dashboard
 - Contas recorrentes (modelos de receita/despesa mensal com lembrete de pendência no dashboard)
-- Exportação de relatórios em **Excel (CSV)** e **PDF**
-- Autenticação completa com reCAPTCHA v2 e login social via **Google (OAuth)**
+- Exportação de relatórios em **Excel (CSV)** e **PDF** (com layout responsivo pra tela antes de imprimir/salvar)
+- **PWA instalável** no Android e iOS — funciona como um app nativo, com ícone na tela de início
+- Autenticação completa: senha (com reCAPTCHA v2), login social via **Google (OAuth)** e login sem senha via **Face ID / Touch ID / biometria** (WebAuthn/Passkeys)
 - Upload de avatar de perfil
 - Banner de consentimento de cookies (LGPD)
 - Rastreamento via **Google Tag Manager**, **Google Analytics 4** e **Hotjar**
@@ -26,10 +27,10 @@ O **Finanças FP** é uma aplicação web construída com Laravel 12 + Alpine.js
 | Camada | Tecnologia |
 |---|---|
 | Back-end | PHP 8.2 · Laravel 12 |
-| Front-end | Alpine.js 3 · Tailwind CSS 3 |
-| Build | Vite 6 · Laravel Vite Plugin |
+| Front-end | Alpine.js 3 (+ plugin `@alpinejs/sort` para drag-and-drop) · Tailwind CSS 3 |
+| Build | Vite 6 · Laravel Vite Plugin · `vite-plugin-pwa` |
 | Banco de dados | MySQL 8 |
-| Autenticação | Laravel Breeze (customizado) · Laravel Socialite (login Google) |
+| Autenticação | Laravel Breeze (customizado) · Laravel Socialite (login Google) · `laravel/passkeys` (login com Face ID/biometria via WebAuthn) |
 | Anti-bot | Google reCAPTCHA v2 |
 | Analytics | Google Tag Manager · GA4 · Hotjar |
 | E-mail | SMTP (Gmail / Mailtrap) |
@@ -134,12 +135,38 @@ RECAPTCHA_SITE_KEY=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
 RECAPTCHA_SECRET_KEY=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
 # Produção: https://www.google.com/recaptcha/admin/create
 
+# ── Passkeys / WebAuthn (login com Face ID / biometria) ─────────────
+# Opcional — se vazio, usa o APP_KEY como fallback. Gere um valor
+# próprio (ex.: Str::random(40)) e diferente por ambiente.
+PASSKEYS_USER_HANDLE_SECRET=
+
 # ── Analytics (opcional) ────────────────────────────
 GTM_ID=GTM-XXXXXXX
 GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
 HOTJAR_ID=
 HOTJAR_SV=6
 ```
+
+---
+
+## 📱 PWA (Progressive Web App)
+
+O sistema pode ser instalado como app no Android e no iOS, funcionando em tela cheia (sem a barra do navegador), com ícone próprio na tela de início.
+
+- **Android/Chrome/Edge**: menu do usuário → **"Instalar App"** → prompt nativo de instalação.
+- **iOS/Safari**: não existe instalação automática — o mesmo item do menu abre um modal com o passo a passo manual (**Compartilhar → Adicionar à Tela de Início**).
+- Assets estáticos (JS/CSS/fontes) ficam em cache via service worker (`vite-plugin-pwa`, gerado em `public/build/sw.js`) para carregamento mais rápido — **páginas HTML nunca ficam em cache**, pra nunca exibir dados financeiros desatualizados offline.
+- Em produção, o service worker precisa do header `Service-Worker-Allowed: /` (já configurado em `public/.htaccess`) pra poder controlar o site inteiro a partir de `/build/sw.js`. Requer Apache com `mod_headers` habilitado.
+- Localmente, o service worker funciona sem HTTPS em `localhost`/`127.0.0.1` (exceção padrão dos navegadores pra desenvolvimento).
+
+## 🔐 Login com Face ID / Biometria (Passkeys)
+
+Login sem senha via **WebAuthn** (Face ID, Touch ID, biometria Android, Windows Hello), usando o pacote oficial [`laravel/passkeys`](https://github.com/laravel/passkeys) — gratuito, self-hosted, sem serviço de terceiros. É **aditivo**: a senha continua funcionando normalmente, o usuário escolhe cadastrar ou não uma passkey.
+
+- Cadastro/gerenciamento em **Perfil → Face ID / Biometria** (adicionar dispositivo, listar, remover).
+- Botão **"Entrar com Face ID / Biometria"** na tela de login — só aparece se o dispositivo tiver um autenticador de plataforma disponível.
+- **Importante**: o WebAuthn não funciona em `127.0.0.1` — só em `localhost` (dev) ou em um domínio real com HTTPS (produção). Se o `APP_URL` do seu `.env` usa `127.0.0.1`, troque para `http://localhost:PORTA` pra testar essa funcionalidade localmente.
+- Cadastrar/remover uma passkey exige confirmação recente de senha (proteção padrão do Laravel) — se você só usa login social e não sabe sua senha, use "Esqueci a senha" pra definir uma antes.
 
 ---
 
@@ -287,13 +314,15 @@ sistema-financeiro/
 │       └── RecurringService.php         # Calcula recorrentes pendentes do mês
 │
 ├── config/
+│   ├── passkeys.php                     # Config do WebAuthn (relying party, timeout, guard)
 │   ├── services.php                     # Chaves de reCAPTCHA e serviços
 │   └── tracking.php                     # GTM_ID, GA_ID, HOTJAR_ID
 │
 ├── database/
-│   └── migrations/                      # Migrations de users, transactions, categories
+│   └── migrations/                      # Migrations de users, transactions, categories, passkeys
 │
 ├── public/
+│   ├── icons/                           # Ícones do PWA (any + maskable + apple-touch-icon)
 │   ├── favicon.ico
 │   └── favicon.svg                      # Favicon com iniciais FP
 │
@@ -301,10 +330,10 @@ sistema-financeiro/
 │   ├── css/
 │   │   └── app.css                      # Design tokens + componentes FP
 │   ├── js/
-│   │   ├── app.js                       # Alpine.js entry point
+│   │   ├── app.js                       # Alpine.js entry point (plugins, passkeys, PWA install, service worker)
 │   │   └── bootstrap.js                 # Axios config
 │   └── views/
-│       ├── auth/                        # Login, register, forgot, reset, verify
+│       ├── auth/                        # Login (senha/Google/Face ID), register, forgot, reset, verify
 │       ├── categories/
 │       │   └── index.blade.php          # CRUD de categorias
 │       ├── components/
@@ -313,15 +342,15 @@ sistema-financeiro/
 │       │   └── auth/
 │       │       └── reset-password.blade.php # Template de e-mail
 │       ├── exports/
-│       │   └── transactions_pdf.blade.php   # Template de PDF
+│       │   └── transactions_pdf.blade.php   # Template de PDF (responsivo na tela, fixo na impressão)
 │       ├── layouts/
-│       │   ├── app.blade.php            # Layout autenticado (sidebar + GTM)
+│       │   ├── app.blade.php            # Layout autenticado (sidebar + menu "Instalar App" + GTM)
 │       │   └── guest.blade.php          # Layout público (login/register)
-│       ├── partials/                    # Modais de exclusão, empty states
+│       ├── partials/                    # Modais de exclusão, empty states, pwa-head.blade.php (meta tags do PWA)
 │       ├── politicas/
 │       │   └── conteudo.blade.php       # Centro de preferências de privacidade
 │       ├── profile/
-│       │   └── edit.blade.php           # Edição de perfil + avatar
+│       │   └── edit.blade.php           # Edição de perfil + avatar + gerenciar passkeys
 │       ├── recurring/
 │       │   ├── create.blade.php         # Nova conta recorrente
 │       │   ├── edit.blade.php           # Editar conta recorrente
@@ -330,14 +359,16 @@ sistema-financeiro/
 │       │   ├── create.blade.php
 │       │   ├── edit.blade.php
 │       │   └── index.blade.php          # Lista com modais de duplicar/excluir
-│       └── dashboard.blade.php          # Dashboard com gráfico + filtros
+│       ├── vendor/pagination/
+│       │   └── tailwind.blade.php       # Paginação (versão compacta mobile + completa desktop)
+│       └── dashboard.blade.php          # Dashboard com gráfico + filtros + cards arrastáveis
 │
 ├── routes/
 │   ├── auth.php                         # Rotas de autenticação
 │   └── web.php                          # Rotas principais
 │
 ├── .env.example                         # Template de variáveis de ambiente
-├── vite.config.js
+├── vite.config.js                       # Inclui vite-plugin-pwa (manifest + service worker)
 ├── tailwind.config.js
 └── package.json
 ```
