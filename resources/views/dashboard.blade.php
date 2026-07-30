@@ -79,7 +79,15 @@
 
     {{-- Receitas --}}
     <div data-card-key="receitas" x-sort:item="receitas"
-         class="fp-draggable bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
+         class="fp-draggable relative bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
+        <div class="flex sm:hidden absolute top-2 right-2 gap-0.5 z-10">
+            <button type="button" onclick="window.FpDashboard.moveCard('receitas','up')" aria-label="Mover Receitas para cima" class="fp-move-btn">
+                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+            </button>
+            <button type="button" onclick="window.FpDashboard.moveCard('receitas','down')" aria-label="Mover Receitas para baixo" class="fp-move-btn">
+                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+            </button>
+        </div>
         <div class="min-w-0">
             <p class="text-sm font-medium text-slate-500 mb-1">Receitas</p>
             <h4 id="card-receitas" class="text-xl md:text-2xl font-bold text-emerald-600 whitespace-nowrap">
@@ -95,7 +103,15 @@
 
     {{-- Despesas --}}
     <div data-card-key="despesas" x-sort:item="despesas"
-         class="fp-draggable bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
+         class="fp-draggable relative bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
+        <div class="flex sm:hidden absolute top-2 right-2 gap-0.5 z-10">
+            <button type="button" onclick="window.FpDashboard.moveCard('despesas','up')" aria-label="Mover Despesas para cima" class="fp-move-btn">
+                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+            </button>
+            <button type="button" onclick="window.FpDashboard.moveCard('despesas','down')" aria-label="Mover Despesas para baixo" class="fp-move-btn">
+                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+            </button>
+        </div>
         <div class="min-w-0">
             <p class="text-sm font-medium text-slate-500 mb-1">Despesas</p>
             <h4 id="card-despesas" class="text-xl md:text-2xl font-bold text-rose-600 whitespace-nowrap">
@@ -111,7 +127,15 @@
 
     {{-- Saldo --}}
     <div data-card-key="saldo" x-sort:item="saldo"
-         class="fp-draggable bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
+         class="fp-draggable relative bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
+        <div class="flex sm:hidden absolute top-2 right-2 gap-0.5 z-10">
+            <button type="button" onclick="window.FpDashboard.moveCard('saldo','up')" aria-label="Mover Saldo para cima" class="fp-move-btn">
+                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+            </button>
+            <button type="button" onclick="window.FpDashboard.moveCard('saldo','down')" aria-label="Mover Saldo para baixo" class="fp-move-btn">
+                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+            </button>
+        </div>
         <div class="min-w-0">
             <p class="text-sm font-medium text-slate-500 mb-1">Saldo Atual</p>
             <h4 id="card-saldo" class="text-xl md:text-2xl font-bold whitespace-nowrap {{ $saldo >= 0 ? 'text-indigo-600' : 'text-rose-700' }}">
@@ -140,13 +164,25 @@
             <h3 id="titulo-grafico" class="text-base font-bold text-slate-800">
                 Gastos por Mês ({{ $ano }})
             </h3>
-            <span x-sort:handle class="fp-drag-handle" title="Arrastar para reordenar" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
-                    <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
-                    <circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/>
-                </svg>
-            </span>
+            <div class="flex items-center gap-1">
+                {{-- Mobile: mover (arraste não é confiável no toque) --}}
+                <div class="flex sm:hidden gap-0.5">
+                    <button type="button" onclick="window.FpDashboard.moveBlock('grafico','up')" aria-label="Mover Gráfico para cima" class="fp-move-btn">
+                        <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <button type="button" onclick="window.FpDashboard.moveBlock('grafico','down')" aria-label="Mover Gráfico para baixo" class="fp-move-btn">
+                        <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                    </button>
+                </div>
+                {{-- Desktop: arrastar --}}
+                <span x-sort:handle class="fp-drag-handle hidden sm:inline-flex" title="Arrastar para reordenar" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
+                        <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
+                        <circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/>
+                    </svg>
+                </span>
+            </div>
         </div>
         <div class="h-[300px] relative">
             <canvas id="grafico-gastos" aria-label="Gráfico de gastos mensais" role="img"></canvas>
@@ -163,7 +199,17 @@
                       class="text-sm font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl">
                     Total: R$ {{ number_format($totalGeral, 2, ',', '.') }}
                 </span>
-                <span x-sort:handle class="fp-drag-handle" title="Arrastar para reordenar" aria-hidden="true">
+                {{-- Mobile: mover (arraste não é confiável no toque) --}}
+                <div class="flex sm:hidden gap-0.5">
+                    <button type="button" onclick="window.FpDashboard.moveBlock('categorias','up')" aria-label="Mover Categorias para cima" class="fp-move-btn">
+                        <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <button type="button" onclick="window.FpDashboard.moveBlock('categorias','down')" aria-label="Mover Categorias para baixo" class="fp-move-btn">
+                        <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                    </button>
+                </div>
+                {{-- Desktop: arrastar --}}
+                <span x-sort:handle class="fp-drag-handle hidden sm:inline-flex" title="Arrastar para reordenar" aria-hidden="true">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                         <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
                         <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
@@ -231,6 +277,16 @@
 }
 .fp-drag-handle:hover { background: #f3f4f6; color: #4b5563; }
 .fp-drag-handle:active { cursor: grabbing; }
+
+/* Botões de mover ↑/↓ — alternativa ao arraste no mobile, onde o toque
+   não é confiável o bastante pra reordenar por drag-and-drop. */
+.fp-move-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 6px;
+    color: #6b7280; background: #f3f4f6; border: none;
+    transition: background-color .15s, color .15s;
+}
+.fp-move-btn:active { background: #e5e7eb; color: #374151; }
 
 /* Placeholder deixado pelo x-sort.ghost no lugar durante o arraste */
 .sortable-ghost { opacity: .4; }

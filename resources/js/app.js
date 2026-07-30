@@ -156,12 +156,38 @@ function fpApplyOrder(containerId, order) {
 fpApplyOrder('dashboard-cards-grid', fpLoadOrder(FP_DASHBOARD_CARDS_KEY));
 fpApplyOrder('dashboard-blocks-grid', fpLoadOrder(FP_DASHBOARD_BLOCKS_KEY));
 
+// Botões de mover ↑/↓ (mobile) — alternativa ao drag-and-drop, que não é
+// confiável em todo navegador/versão de iOS no toque. Reaproveita a mesma
+// persistência (fpSaveOrder) usada pelo arraste no desktop.
+function fpMoveItem(containerId, cardKey, direction) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const el = container.querySelector('[data-card-key="' + cardKey + '"]');
+    if (!el) return;
+
+    if (direction === 'up') {
+        const prev = el.previousElementSibling;
+        if (prev) container.insertBefore(el, prev);
+    } else {
+        const next = el.nextElementSibling;
+        if (next) container.insertBefore(next, el);
+    }
+}
+
 window.FpDashboard = {
     onCardsSort() {
         fpSaveOrder(FP_DASHBOARD_CARDS_KEY, fpReadCurrentOrder('dashboard-cards-grid'));
     },
     onBlocksSort() {
         fpSaveOrder(FP_DASHBOARD_BLOCKS_KEY, fpReadCurrentOrder('dashboard-blocks-grid'));
+    },
+    moveCard(key, direction) {
+        fpMoveItem('dashboard-cards-grid', key, direction);
+        this.onCardsSort();
+    },
+    moveBlock(key, direction) {
+        fpMoveItem('dashboard-blocks-grid', key, direction);
+        this.onBlocksSort();
     },
 };
 
