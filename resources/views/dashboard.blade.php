@@ -11,11 +11,12 @@
         <p class="text-sm text-slate-400 mt-0.5">Aqui está o resumo das suas finanças.</p>
     </div>
 
-    {{-- Filtros + Exportação --}}
-    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+    {{-- Filtros + Exportação — grid 2x2 no mobile (ano+mês / excel+pdf),
+         linha única a partir de sm: --}}
+    <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:items-center w-full sm:w-auto">
 
         {{-- Select Ano — customizado com seta correta --}}
-        <div class="relative flex-1 min-w-[90px] sm:flex-none sm:min-w-0">
+        <div class="relative">
             <select id="select-ano" class="fp-select fp-select-sm">
                 @foreach($anosDisponiveis as $a)
                     <option value="{{ $a }}" {{ (string)$ano === (string)$a ? 'selected' : '' }}>{{ $a }}</option>
@@ -24,7 +25,7 @@
         </div>
 
         {{-- Select Mês --}}
-        <div class="relative flex-1 min-w-[130px] sm:flex-none sm:min-w-0">
+        <div class="relative">
             <select id="select-mes" class="fp-select fp-select-sm">
                 <option value="">Todos os Meses</option>
                 @php
@@ -45,8 +46,8 @@
            href="{{ route('transacoes.export.excel', ['ano' => $ano, 'mes' => request('mes')]) }}"
            target="_blank"
            rel="noopener noreferrer"
-           class="inline-flex items-center justify-center gap-1.5 text-sm px-3 py-2 bg-emerald-600 hover:bg-emerald-700
-                  text-white rounded-xl shadow-sm font-semibold transition-all whitespace-nowrap flex-shrink-0">
+           class="inline-flex items-center justify-center gap-1.5 text-sm px-3 py-2.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700
+                  active:bg-emerald-800 text-white rounded-xl shadow-sm font-semibold transition-all whitespace-nowrap">
             <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
@@ -58,8 +59,8 @@
            href="{{ route('transacoes.export.pdf', ['ano' => $ano, 'mes' => request('mes')]) }}"
            target="_blank"
            rel="noopener noreferrer"
-           class="inline-flex items-center justify-center gap-1.5 text-sm px-3 py-2 bg-rose-600 hover:bg-rose-700
-                  text-white rounded-xl shadow-sm font-semibold transition-all whitespace-nowrap flex-shrink-0">
+           class="inline-flex items-center justify-center gap-1.5 text-sm px-3 py-2.5 sm:py-2 bg-rose-600 hover:bg-rose-700
+                  active:bg-rose-800 text-white rounded-xl shadow-sm font-semibold transition-all whitespace-nowrap">
             <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
@@ -73,7 +74,8 @@
      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6 md:mb-8"
      x-data="{}"
      x-sort="window.FpDashboard.onCardsSort()"
-     x-sort.ghost>
+     x-sort.ghost
+     x-sort:config="{ delay: 150, delayOnTouchOnly: true }">
 
     {{-- Receitas --}}
     <div data-card-key="receitas" x-sort:item="receitas"
@@ -128,7 +130,8 @@
      class="grid grid-cols-1 lg:grid-cols-3 gap-6"
      x-data="{}"
      x-sort="window.FpDashboard.onBlocksSort()"
-     x-sort.ghost>
+     x-sort.ghost
+     x-sort:config="{ delay: 150, delayOnTouchOnly: true }">
 
     {{-- Gráfico --}}
     <div data-card-key="grafico" x-sort:item="grafico"
