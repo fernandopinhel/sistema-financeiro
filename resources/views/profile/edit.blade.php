@@ -285,6 +285,30 @@
     </div>
 </dialog>
 
+{{-- Modal de nome do dispositivo (cadastro de passkey) — usa <dialog> em vez de
+     window.prompt() de propósito: no Safari/iOS, um prompt() nativo consome o
+     "gesto do usuário" e o Face ID que viria em seguida falha silenciosamente. --}}
+<dialog id="passkeyAddModal" style="border:none;border-radius:16px;padding:0;box-shadow:0 20px 60px rgba(0,0,0,.2);max-width:380px;width:90vw;">
+    <div style="padding:24px;">
+        <h3 style="font-size:16px;font-weight:700;color:var(--fp-text);margin:0 0 8px;">Adicionar este dispositivo</h3>
+        <p style="font-size:13px;color:var(--fp-muted);line-height:1.5;margin:0 0 14px;">
+            Dê um nome pra esse dispositivo, pra identificar depois na lista:
+        </p>
+        <input type="text" id="passkeyAddNameInput" class="fp-input" placeholder='Ex.: "iPhone do Fernando"' maxlength="255"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();fpConfirmRegisterPasskey();}">
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+            <button type="button" class="fp-btn fp-btn-ghost fp-btn-sm"
+                    onclick="document.getElementById('passkeyAddModal').close()">
+                Cancelar
+            </button>
+            <button type="button" class="fp-btn fp-btn-secondary fp-btn-sm"
+                    onclick="fpConfirmRegisterPasskey()">
+                Cadastrar
+            </button>
+        </div>
+    </div>
+</dialog>
+
 {{-- Modal de confirmação de remoção de passkey --}}
 <dialog id="passkeyRemoveModal" style="border:none;border-radius:16px;padding:0;box-shadow:0 20px 60px rgba(0,0,0,.2);max-width:420px;width:90vw;">
     <div style="padding:28px;">
@@ -363,8 +387,21 @@
     }
 
     window.fpRegisterPasskey = function () {
-        var name = window.prompt('Dê um nome pra esse dispositivo (ex.: "iPhone do Fernando"):', '');
+        var input = document.getElementById('passkeyAddNameInput');
+        input.value = '';
+        document.getElementById('passkeyAddModal').showModal();
+        input.focus();
+    };
+
+    window.fpConfirmRegisterPasskey = function () {
+        var name = document.getElementById('passkeyAddNameInput').value.trim();
         if (!name) return;
+
+        // Fecha o modal ANTES de chamar Passkeys.register() — no Safari/iOS,
+        // qualquer diálogo nativo bloqueante (prompt/alert/confirm) logo antes
+        // do WebAuthn consome o "gesto do usuário" e o Face ID falha em
+        // silêncio. Um <dialog> comum não tem esse problema.
+        document.getElementById('passkeyAddModal').close();
 
         var btn = document.getElementById('passkey-add-btn');
         btn.disabled = true;
