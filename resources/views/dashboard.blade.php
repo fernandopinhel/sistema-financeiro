@@ -216,13 +216,7 @@
 @push('scripts')
 <style>
 /* Dashboard arrastável — affordance visual de drag-and-drop (@alpinejs/sort) */
-.fp-draggable {
-    cursor: grab;
-    /* Sem isso, o navegador (principalmente iOS) tenta interpretar o toque
-       como rolagem/zoom no meio do arraste, e o SortableJS perde o controle
-       do gesto — o item "levanta" mas nunca completa a troca de posição. */
-    touch-action: none;
-}
+.fp-draggable { cursor: grab; }
 .fp-draggable:active { cursor: grabbing; }
 
 .fp-drag-handle {
@@ -230,6 +224,9 @@
     width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
     color: #9ca3af; cursor: grab;
     transition: background-color .15s, color .15s;
+    /* Handle é uma área pequena e dedicada, então dá pra tirar o navegador
+       do controle do toque só aqui, sem afetar a rolagem do resto da página
+       (diferente de aplicar em .fp-draggable, que tomava o cartão inteiro). */
     touch-action: none;
 }
 .fp-drag-handle:hover { background: #f3f4f6; color: #4b5563; }
