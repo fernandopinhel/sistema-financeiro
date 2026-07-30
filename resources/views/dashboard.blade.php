@@ -157,37 +157,23 @@
 </div>
 
 <div id="dashboard-blocks-grid"
-     class="grid grid-cols-1 lg:grid-cols-3 gap-6"
-     x-data="{}"
-     x-sort="window.FpDashboard.onBlocksSort()"
-     x-sort.ghost
-     x-sort:config="{ delay: 150, delayOnTouchOnly: true }">
+     class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     {{-- Gráfico --}}
-    <div data-card-key="grafico" x-sort:item="grafico"
+    <div data-card-key="grafico"
          class="lg:col-span-2 bg-white border border-slate-100 rounded-2xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
             <h3 id="titulo-grafico" class="text-base font-bold text-slate-800">
                 Gastos por Mês ({{ $ano }})
             </h3>
-            <div class="flex items-center gap-1">
-                {{-- Mobile: mover (arraste não é confiável no toque) --}}
-                <div class="flex sm:hidden gap-0.5">
-                    <button type="button" onclick="window.FpDashboard.moveBlock('grafico','up')" aria-label="Mover Gráfico para cima" class="fp-move-btn">
-                        <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
-                    </button>
-                    <button type="button" onclick="window.FpDashboard.moveBlock('grafico','down')" aria-label="Mover Gráfico para baixo" class="fp-move-btn">
-                        <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-                    </button>
-                </div>
-                {{-- Desktop: arrastar --}}
-                <span x-sort:handle class="fp-drag-handle hidden sm:inline-flex" title="Arrastar para reordenar" aria-hidden="true">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
-                        <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
-                        <circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/>
-                    </svg>
-                </span>
+            {{-- Mover (sem drag-and-drop — botões pra reordenar em qualquer tamanho de tela) --}}
+            <div class="flex gap-0.5">
+                <button type="button" onclick="window.FpDashboard.moveBlock('grafico','up')" aria-label="Mover Gráfico para cima" class="fp-move-btn">
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+                </button>
+                <button type="button" onclick="window.FpDashboard.moveBlock('grafico','down')" aria-label="Mover Gráfico para baixo" class="fp-move-btn">
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                </button>
             </div>
         </div>
         <div class="h-[300px] relative">
@@ -196,17 +182,13 @@
     </div>
 
     {{-- Categorias com filtro de busca --}}
-    <div data-card-key="categorias" x-sort:item="categorias"
+    <div data-card-key="categorias"
          class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex flex-col">
-        <div class="flex items-center justify-between mb-3">
-            <h3 class="text-base font-bold text-slate-800">Categorias</h3>
-            <div class="flex items-center gap-2">
-                <span id="total-geral-badge"
-                      class="text-sm font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl">
-                    Total: R$ {{ number_format($totalGeral, 2, ',', '.') }}
-                </span>
-                {{-- Mobile: mover (arraste não é confiável no toque) --}}
-                <div class="flex sm:hidden gap-0.5">
+        <div class="mb-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-slate-800">Categorias</h3>
+                {{-- Mover (sem drag-and-drop — botões pra reordenar em qualquer tamanho de tela) --}}
+                <div class="flex gap-0.5">
                     <button type="button" onclick="window.FpDashboard.moveBlock('categorias','up')" aria-label="Mover Categorias para cima" class="fp-move-btn">
                         <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
                     </button>
@@ -214,15 +196,11 @@
                         <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                     </button>
                 </div>
-                {{-- Desktop: arrastar --}}
-                <span x-sort:handle class="fp-drag-handle hidden sm:inline-flex" title="Arrastar para reordenar" aria-hidden="true">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
-                        <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
-                        <circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/>
-                    </svg>
-                </span>
             </div>
+            <span id="total-geral-badge"
+                  class="inline-block mt-2 text-sm font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl whitespace-nowrap">
+                Total: R$ {{ number_format($totalGeral, 2, ',', '.') }}
+            </span>
         </div>
 
         {{-- Filtro de busca por categoria --}}
@@ -271,21 +249,9 @@
 .fp-draggable { cursor: grab; }
 .fp-draggable:active { cursor: grabbing; }
 
-.fp-drag-handle {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
-    color: #9ca3af; cursor: grab;
-    transition: background-color .15s, color .15s;
-    /* Handle é uma área pequena e dedicada, então dá pra tirar o navegador
-       do controle do toque só aqui, sem afetar a rolagem do resto da página
-       (diferente de aplicar em .fp-draggable, que tomava o cartão inteiro). */
-    touch-action: none;
-}
-.fp-drag-handle:hover { background: #f3f4f6; color: #4b5563; }
-.fp-drag-handle:active { cursor: grabbing; }
-
-/* Botões de mover ↑/↓ — alternativa ao arraste no mobile, onde o toque
-   não é confiável o bastante pra reordenar por drag-and-drop. */
+/* Botões de mover ↑/↓ — usados pelos blocos de Gráfico/Categorias em
+   qualquer tamanho de tela (sem drag-and-drop) e pelos cards de resumo
+   no mobile (no desktop os cards de resumo continuam arrastáveis). */
 .fp-move-btn {
     display: inline-flex; align-items: center; justify-content: center;
     width: 22px; height: 22px; border-radius: 6px;
