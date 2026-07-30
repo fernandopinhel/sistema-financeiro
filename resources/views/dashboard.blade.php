@@ -79,73 +79,79 @@
 
     {{-- Receitas --}}
     <div data-card-key="receitas" x-sort:item="receitas"
-         class="fp-draggable relative bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
-        <div class="flex sm:hidden absolute top-2 right-2 gap-0.5 z-10">
-            <button type="button" onclick="window.FpDashboard.moveCard('receitas','up')" aria-label="Mover Receitas para cima" class="fp-move-btn">
-                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
-            </button>
-            <button type="button" onclick="window.FpDashboard.moveCard('receitas','down')" aria-label="Mover Receitas para baixo" class="fp-move-btn">
-                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-            </button>
-        </div>
+         class="fp-draggable bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
         <div class="min-w-0">
             <p class="text-sm font-medium text-slate-500 mb-1">Receitas</p>
             <h4 id="card-receitas" class="text-xl md:text-2xl font-bold text-emerald-600 whitespace-nowrap">
                 R$ {{ number_format($receitas, 2, ',', '.') }}
             </h4>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100/50 flex items-center justify-center p-3 text-emerald-600 flex-shrink-0">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-            </svg>
+        <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100/50 flex items-center justify-center p-3 text-emerald-600 flex-shrink-0">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+            </div>
+            <div class="flex sm:hidden flex-col gap-1">
+                <button type="button" onclick="window.FpDashboard.moveCard('receitas','up')" aria-label="Mover Receitas para cima" class="fp-move-btn">
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+                </button>
+                <button type="button" onclick="window.FpDashboard.moveCard('receitas','down')" aria-label="Mover Receitas para baixo" class="fp-move-btn">
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                </button>
+            </div>
         </div>
     </div>
 
     {{-- Despesas --}}
     <div data-card-key="despesas" x-sort:item="despesas"
-         class="fp-draggable relative bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
-        <div class="flex sm:hidden absolute top-2 right-2 gap-0.5 z-10">
-            <button type="button" onclick="window.FpDashboard.moveCard('despesas','up')" aria-label="Mover Despesas para cima" class="fp-move-btn">
-                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
-            </button>
-            <button type="button" onclick="window.FpDashboard.moveCard('despesas','down')" aria-label="Mover Despesas para baixo" class="fp-move-btn">
-                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-            </button>
-        </div>
+         class="fp-draggable bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
         <div class="min-w-0">
             <p class="text-sm font-medium text-slate-500 mb-1">Despesas</p>
             <h4 id="card-despesas" class="text-xl md:text-2xl font-bold text-rose-600 whitespace-nowrap">
                 R$ {{ number_format($despesas, 2, ',', '.') }}
             </h4>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-100/50 flex items-center justify-center p-3 text-rose-600 flex-shrink-0">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"/>
-            </svg>
+        <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-100/50 flex items-center justify-center p-3 text-rose-600 flex-shrink-0">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"/>
+                </svg>
+            </div>
+            <div class="flex sm:hidden flex-col gap-1">
+                <button type="button" onclick="window.FpDashboard.moveCard('despesas','up')" aria-label="Mover Despesas para cima" class="fp-move-btn">
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+                </button>
+                <button type="button" onclick="window.FpDashboard.moveCard('despesas','down')" aria-label="Mover Despesas para baixo" class="fp-move-btn">
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                </button>
+            </div>
         </div>
     </div>
 
     {{-- Saldo --}}
     <div data-card-key="saldo" x-sort:item="saldo"
-         class="fp-draggable relative bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
-        <div class="flex sm:hidden absolute top-2 right-2 gap-0.5 z-10">
-            <button type="button" onclick="window.FpDashboard.moveCard('saldo','up')" aria-label="Mover Saldo para cima" class="fp-move-btn">
-                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
-            </button>
-            <button type="button" onclick="window.FpDashboard.moveCard('saldo','down')" aria-label="Mover Saldo para baixo" class="fp-move-btn">
-                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-            </button>
-        </div>
+         class="fp-draggable bg-white border border-slate-100 rounded-2xl shadow-sm p-5 flex items-center justify-between gap-3">
         <div class="min-w-0">
             <p class="text-sm font-medium text-slate-500 mb-1">Saldo Atual</p>
             <h4 id="card-saldo" class="text-xl md:text-2xl font-bold whitespace-nowrap {{ $saldo >= 0 ? 'text-indigo-600' : 'text-rose-700' }}">
                 R$ {{ number_format($saldo, 2, ',', '.') }}
             </h4>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100/50 flex items-center justify-center p-3 text-indigo-600 flex-shrink-0">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
+        <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100/50 flex items-center justify-center p-3 text-indigo-600 flex-shrink-0">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="flex sm:hidden flex-col gap-1">
+                <button type="button" onclick="window.FpDashboard.moveCard('saldo','up')" aria-label="Mover Saldo para cima" class="fp-move-btn">
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+                </button>
+                <button type="button" onclick="window.FpDashboard.moveCard('saldo','down')" aria-label="Mover Saldo para baixo" class="fp-move-btn">
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                </button>
+            </div>
         </div>
     </div>
 </div>
