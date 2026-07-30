@@ -216,7 +216,13 @@
 @push('scripts')
 <style>
 /* Dashboard arrastável — affordance visual de drag-and-drop (@alpinejs/sort) */
-.fp-draggable { cursor: grab; }
+.fp-draggable {
+    cursor: grab;
+    /* Sem isso, o navegador (principalmente iOS) tenta interpretar o toque
+       como rolagem/zoom no meio do arraste, e o SortableJS perde o controle
+       do gesto — o item "levanta" mas nunca completa a troca de posição. */
+    touch-action: none;
+}
 .fp-draggable:active { cursor: grabbing; }
 
 .fp-drag-handle {
@@ -224,6 +230,7 @@
     width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
     color: #9ca3af; cursor: grab;
     transition: background-color .15s, color .15s;
+    touch-action: none;
 }
 .fp-drag-handle:hover { background: #f3f4f6; color: #4b5563; }
 .fp-drag-handle:active { cursor: grabbing; }
