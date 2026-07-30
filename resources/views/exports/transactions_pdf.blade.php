@@ -103,9 +103,9 @@
 </head>
 <body>
 
-<div class="no-print ">
+<div class="no-print">
     <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
-    <!--button class="btn btn-secondary" onclick="window.history.back()">← Voltar</!--button-->
+    <a class="btn btn-secondary" href="{{ route('dashboard') }}" style="text-decoration:none;display:inline-flex;align-items:center;">← Voltar ao sistema</a>
 </div>
 
 <div class="header">

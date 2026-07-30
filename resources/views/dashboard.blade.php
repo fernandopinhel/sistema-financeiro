@@ -405,14 +405,41 @@
         selectMes.addEventListener('change', gerenciarFiltros);
         filtroCat.addEventListener('input', aplicarFiltroCat);
 
-        // Excel e PDF sempre em nova aba/contexto — essencial no PWA instalado:
-        // sem isso, o download navega a janela do app inteira pra uma URL de
-        // download, e como o PWA standalone não tem barra de navegador/botão
-        // voltar, o usuário fica preso sem como retornar ao sistema.
-        btnExcel.setAttribute('target', '_blank');
-        btnExcel.setAttribute('rel', 'noopener noreferrer');
+        // PDF em nova aba/contexto (funciona bem em navegador normal e Android).
         btnPdf.setAttribute('target', '_blank');
         btnPdf.setAttribute('rel', 'noopener noreferrer');
+
+        // Excel: baixa via blob em vez de navegar. No PWA instalado do iOS,
+        // target="_blank" não abre um contexto separado de verdade — a
+        // navegação "prende" dentro da janela do app, sem barra nem botão de
+        // voltar. Baixar por blob nunca navega a página, então não tem como
+        // prender em lugar nenhum, em qualquer plataforma.
+        btnExcel.addEventListener('click', function (e) {
+            e.preventDefault();
+            var url = this.href;
+
+            fetch(url, { credentials: 'same-origin' })
+                .then(function (r) {
+                    if (!r.ok) throw new Error('Falha ao exportar.');
+                    var disposition = r.headers.get('Content-Disposition') || '';
+                    var match = disposition.match(/filename="?([^"]+)"?/);
+                    var filename = match ? match[1] : 'transacoes.csv';
+                    return r.blob().then(function (blob) { return { blob: blob, filename: filename }; });
+                })
+                .then(function (result) {
+                    var blobUrl = URL.createObjectURL(result.blob);
+                    var a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = result.filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    setTimeout(function () { URL.revokeObjectURL(blobUrl); }, 1000);
+                })
+                .catch(function () {
+                    window.alert('Não foi possível baixar o Excel. Tente novamente.');
+                });
+        });
     });
 })();
 </script>
