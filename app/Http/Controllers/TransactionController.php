@@ -51,16 +51,34 @@ class TransactionController extends Controller
         $totalGeral  = 0;
 
         $categoriasDashboard = $user->categories()->where('show_on_dashboard', true)->get();
+
+        // Soma receita/despesa por categoria numa única query (agrupada por
+        // category_id + type), em vez de 2 queries por categoria no loop.
+        $queryTipos = $user->transactions()
+            ->whereIn('category_id', $categoriasDashboard->pluck('id'))
+            ->whereYear('date', $ano);
+
+        if ($mesFiltro) {
+            $queryTipos->whereMonth('date', (int) $mesFiltro);
+        }
+
+        $somasPorCategoriaTipo = $queryTipos
+            ->selectRaw('category_id, type, SUM(amount) as total')
+            ->groupBy('category_id', 'type')
+            ->get()
+            ->groupBy('category_id');
+
+        $maiorDespesaCategoriaId = null;
+        $maiorReceitaCategoriaId = null;
+        $maiorDespesaValor = 0;
+        $maiorReceitaValor = 0;
+
         foreach ($categoriasDashboard as $cat) {
-            $queryCat = $user->transactions()
-                ->where('category_id', $cat->id)
-                ->whereYear('date', $ano);
+            $porTipo      = $somasPorCategoriaTipo->get($cat->id, collect());
+            $somaDespesas = (float) ($porTipo->firstWhere('type', 'expense')->total ?? 0);
+            $somaReceitas = (float) ($porTipo->firstWhere('type', 'income')->total ?? 0);
+            $soma         = $somaDespesas + $somaReceitas;
 
-            if ($mesFiltro) {
-                $queryCat->whereMonth('date', (int) $mesFiltro);
-            }
-
-            $soma = (float) $queryCat->sum('amount');
             $dadosCards[] = [
                 'id'    => $cat->id,
                 'name'  => $cat->name,
@@ -68,16 +86,27 @@ class TransactionController extends Controller
                 'total' => $soma,
             ];
             $totalGeral += $soma;
+
+            if ($somaDespesas > $maiorDespesaValor) {
+                $maiorDespesaValor       = $somaDespesas;
+                $maiorDespesaCategoriaId = $cat->id;
+            }
+            if ($somaReceitas > $maiorReceitaValor) {
+                $maiorReceitaValor       = $somaReceitas;
+                $maiorReceitaCategoriaId = $cat->id;
+            }
         }
 
         if ($request->ajax() || $request->expectsJson() || $request->has('json')) {
             return response()->json([
-                'dadosAnuais' => $dadosAnuais,
-                'receitas'    => $receitas,
-                'despesas'    => $despesas,
-                'saldo'       => $saldo,
-                'dadosCards'  => $dadosCards,
-                'totalGeral'  => $totalGeral,
+                'dadosAnuais'              => $dadosAnuais,
+                'receitas'                 => $receitas,
+                'despesas'                 => $despesas,
+                'saldo'                    => $saldo,
+                'dadosCards'               => $dadosCards,
+                'totalGeral'               => $totalGeral,
+                'maiorDespesaCategoriaId'  => $maiorDespesaCategoriaId,
+                'maiorReceitaCategoriaId'  => $maiorReceitaCategoriaId,
             ]);
         }
 
@@ -86,7 +115,8 @@ class TransactionController extends Controller
         return view('dashboard', compact(
             'ano', 'dadosAnuais', 'dadosCards', 'totalGeral',
             'anosDisponiveis', 'categoriasDashboard',
-            'receitas', 'despesas', 'saldo'
+            'receitas', 'despesas', 'saldo',
+            'maiorDespesaCategoriaId', 'maiorReceitaCategoriaId'
         ));
     }
 

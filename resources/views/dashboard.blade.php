@@ -222,6 +222,20 @@
                     <div class="flex items-center gap-2.5 min-w-0">
                         <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: {{ $card['color'] }}"></span>
                         <span class="text-sm font-semibold text-slate-700 truncate cat-name">{{ $card['name'] }}</span>
+                        @if($card['id'] === $maiorReceitaCategoriaId)
+                            <span class="cat-crown cat-crown-receita" title="Maior receita do período" aria-label="Maior receita do período">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                </svg>
+                            </span>
+                        @endif
+                        @if($card['id'] === $maiorDespesaCategoriaId)
+                            <span class="cat-crown cat-crown-despesa" title="Maior despesa do período" aria-label="Maior despesa do período">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"/>
+                                </svg>
+                            </span>
+                        @endif
                     </div>
                     <span class="text-xs font-bold text-slate-500 bg-white border border-slate-100 px-2 py-1 rounded-lg flex-shrink-0">
                         R$ {{ number_format($card['total'], 2, ',', '.') }}
@@ -259,6 +273,14 @@
     transition: background-color .15s, color .15s;
 }
 .fp-move-btn:active { background: #e5e7eb; color: #374151; }
+
+/* Selo de "maior despesa"/"maior receita" da categoria no período filtrado */
+.cat-crown {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 999px; flex-shrink: 0;
+}
+.cat-crown-despesa { background: #ffe4e6; color: #e11d48; }
+.cat-crown-receita { background: #d1fae5; color: #059669; }
 
 /* Placeholder deixado pelo x-sort.ghost no lugar durante o arraste */
 .sortable-ghost { opacity: .4; }
@@ -391,6 +413,19 @@
                 container.innerHTML = '';
 
                 if (data.dadosCards && data.dadosCards.length > 0) {
+                    const crownReceita = `
+                        <span class="cat-crown cat-crown-receita" title="Maior receita do período" aria-label="Maior receita do período">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                            </svg>
+                        </span>`;
+                    const crownDespesa = `
+                        <span class="cat-crown cat-crown-despesa" title="Maior despesa do período" aria-label="Maior despesa do período">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"/>
+                            </svg>
+                        </span>`;
+
                     data.dadosCards.forEach(card => {
                         const div = document.createElement('div');
                         div.className = 'cat-item flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100/80';
@@ -400,6 +435,8 @@
                                 <span class="w-3 h-3 rounded-full flex-shrink-0"
                                       style="background-color:${card.color}"></span>
                                 <span class="text-sm font-semibold text-slate-700 truncate cat-name">${card.name}</span>
+                                ${card.id === data.maiorReceitaCategoriaId ? crownReceita : ''}
+                                ${card.id === data.maiorDespesaCategoriaId ? crownDespesa : ''}
                             </div>
                             <span class="text-xs font-bold text-slate-500 bg-white border border-slate-100 px-2 py-1 rounded-lg flex-shrink-0">
                                 ${formatarMoeda(card.total)}
