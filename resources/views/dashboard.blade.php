@@ -249,7 +249,7 @@
                 </span>
                 @if($maiorDespesaCategoriaId)
                     <span id="maior-despesa-badge"
-                          class="inline-flex items-center gap-1 max-w-full text-sm font-bold text-rose-700 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-xl"
+                          class="inline-flex items-center gap-1 flex-1 sm:flex-initial min-w-0 max-w-full text-sm font-bold text-rose-700 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-xl"
                           title="Maior despesa do período" aria-label="Maior despesa do período">
                         <svg width="12" height="12" class="flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"/>
@@ -260,7 +260,7 @@
                 @endif
                 @if($maiorReceitaCategoriaId)
                     <span id="maior-receita-badge"
-                          class="inline-flex items-center gap-1 max-w-full text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-xl"
+                          class="inline-flex items-center gap-1 flex-1 sm:flex-initial min-w-0 max-w-full text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-xl"
                           title="Maior receita do período" aria-label="Maior receita do período">
                         <svg width="12" height="12" class="flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
@@ -514,7 +514,7 @@
                 function criarBadgeDestaque(id, nome, valor, cor, pathIcone, tituloAcessivel) {
                     const span = document.createElement('span');
                     span.id = id;
-                    span.className = `inline-flex items-center gap-1 max-w-full text-sm font-bold text-${cor}-700 bg-${cor}-50 border border-${cor}-100 px-2.5 py-1 rounded-xl`;
+                    span.className = `inline-flex items-center gap-1 flex-1 sm:flex-initial min-w-0 max-w-full text-sm font-bold text-${cor}-700 bg-${cor}-50 border border-${cor}-100 px-2.5 py-1 rounded-xl`;
                     span.title = tituloAcessivel;
                     span.setAttribute('aria-label', tituloAcessivel);
                     span.innerHTML = `
