@@ -100,6 +100,13 @@
                     <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                 </button>
             </div>
+            <span x-sort:handle class="fp-drag-handle" title="Arrastar para reordenar" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
+                    <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
+                    <circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/>
+                </svg>
+            </span>
         </div>
     </div>
 
@@ -126,6 +133,13 @@
                     <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                 </button>
             </div>
+            <span x-sort:handle class="fp-drag-handle" title="Arrastar para reordenar" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
+                    <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
+                    <circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/>
+                </svg>
+            </span>
         </div>
     </div>
 
@@ -152,6 +166,13 @@
                     <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                 </button>
             </div>
+            <span x-sort:handle class="fp-drag-handle" title="Arrastar para reordenar" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
+                    <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
+                    <circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/>
+                </svg>
+            </span>
         </div>
     </div>
 </div>
@@ -181,7 +202,7 @@
                     </button>
                 </div>
                 {{-- Desktop: arrastar --}}
-                <span x-sort:handle class="fp-drag-handle hidden sm:inline-flex" title="Arrastar para reordenar" aria-hidden="true">
+                <span x-sort:handle class="fp-drag-handle" title="Arrastar para reordenar" aria-hidden="true">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                         <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
                         <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
@@ -212,7 +233,7 @@
                         </button>
                     </div>
                     {{-- Desktop: arrastar --}}
-                    <span x-sort:handle class="fp-drag-handle hidden sm:inline-flex" title="Arrastar para reordenar" aria-hidden="true">
+                    <span x-sort:handle class="fp-drag-handle" title="Arrastar para reordenar" aria-hidden="true">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                             <circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/>
                             <circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/>
@@ -223,7 +244,7 @@
             </div>
             <div id="categorias-badges-row" class="flex flex-wrap items-center gap-2 mt-2">
                 <span id="total-geral-badge"
-                      class="inline-flex items-center flex-shrink-0 text-sm font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl whitespace-nowrap">
+                      class="inline-flex items-center flex-shrink-0 w-full sm:w-auto text-sm font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl whitespace-nowrap">
                     Total: R$ {{ number_format($totalGeral, 2, ',', '.') }}
                 </span>
                 @if($maiorDespesaCategoriaId)
@@ -307,12 +328,21 @@
 
 @push('scripts')
 <style>
-/* Dashboard arrastável — affordance visual de drag-and-drop (@alpinejs/sort) */
-.fp-draggable { cursor: grab; }
-.fp-draggable:active { cursor: grabbing; }
-
+/* Dashboard arrastável — o arraste é sempre iniciado pelo .fp-drag-handle
+   (não pelo cartão/bloco inteiro), tanto nos cards de resumo quanto nos
+   blocos de Gráfico/Categorias. */
 .fp-drag-handle {
-    display: inline-flex; align-items: center; justify-content: center;
+    /* display fica só aqui dentro (base = oculto, breakpoint sm = visível),
+       sem depender das classes utilitárias hidden/sm:inline-flex do Tailwind:
+       essa regra é uma folha de estilo própria (a <style> desta página), que
+       vem DEPOIS do CSS compilado do Tailwind no documento — então, em caso
+       de empate de especificidade (classe única vs. classe única), ela sempre
+       venceria e ficaria visível mesmo com a classe "hidden" aplicada. Foi
+       exatamente esse bug que deixava o ícone pontilhado aparecendo também
+       no mobile/web app. Controlando o display 100% aqui dentro, o
+       comportamento fica garantido em qualquer ordem de cascata. */
+    display: none;
+    align-items: center; justify-content: center;
     width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
     color: #9ca3af; cursor: grab;
     transition: background-color .15s, color .15s;
@@ -320,6 +350,9 @@
        do controle do toque só aqui, sem afetar a rolagem do resto da página
        (diferente de aplicar em .fp-draggable, que tomava o cartão inteiro). */
     touch-action: none;
+}
+@media (min-width: 640px) {
+    .fp-drag-handle { display: inline-flex; }
 }
 .fp-drag-handle:hover { background: #f3f4f6; color: #4b5563; }
 .fp-drag-handle:active { cursor: grabbing; }
