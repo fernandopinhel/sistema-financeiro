@@ -68,8 +68,10 @@ class TransactionController extends Controller
             ->get()
             ->groupBy('category_id');
 
-        $maiorDespesaCategoriaId = null;
-        $maiorReceitaCategoriaId = null;
+        $maiorDespesaCategoriaId   = null;
+        $maiorReceitaCategoriaId   = null;
+        $maiorDespesaCategoriaNome = null;
+        $maiorReceitaCategoriaNome = null;
         $maiorDespesaValor = 0;
         $maiorReceitaValor = 0;
 
@@ -88,25 +90,31 @@ class TransactionController extends Controller
             $totalGeral += $soma;
 
             if ($somaDespesas > $maiorDespesaValor) {
-                $maiorDespesaValor       = $somaDespesas;
-                $maiorDespesaCategoriaId = $cat->id;
+                $maiorDespesaValor         = $somaDespesas;
+                $maiorDespesaCategoriaId   = $cat->id;
+                $maiorDespesaCategoriaNome = $cat->name;
             }
             if ($somaReceitas > $maiorReceitaValor) {
-                $maiorReceitaValor       = $somaReceitas;
-                $maiorReceitaCategoriaId = $cat->id;
+                $maiorReceitaValor         = $somaReceitas;
+                $maiorReceitaCategoriaId   = $cat->id;
+                $maiorReceitaCategoriaNome = $cat->name;
             }
         }
 
         if ($request->ajax() || $request->expectsJson() || $request->has('json')) {
             return response()->json([
-                'dadosAnuais'              => $dadosAnuais,
-                'receitas'                 => $receitas,
-                'despesas'                 => $despesas,
-                'saldo'                    => $saldo,
-                'dadosCards'               => $dadosCards,
-                'totalGeral'               => $totalGeral,
-                'maiorDespesaCategoriaId'  => $maiorDespesaCategoriaId,
-                'maiorReceitaCategoriaId'  => $maiorReceitaCategoriaId,
+                'dadosAnuais'                => $dadosAnuais,
+                'receitas'                   => $receitas,
+                'despesas'                   => $despesas,
+                'saldo'                      => $saldo,
+                'dadosCards'                 => $dadosCards,
+                'totalGeral'                 => $totalGeral,
+                'maiorDespesaCategoriaId'    => $maiorDespesaCategoriaId,
+                'maiorReceitaCategoriaId'    => $maiorReceitaCategoriaId,
+                'maiorDespesaCategoriaNome'  => $maiorDespesaCategoriaNome,
+                'maiorReceitaCategoriaNome'  => $maiorReceitaCategoriaNome,
+                'maiorDespesaValor'          => $maiorDespesaValor,
+                'maiorReceitaValor'          => $maiorReceitaValor,
             ]);
         }
 
@@ -116,7 +124,9 @@ class TransactionController extends Controller
             'ano', 'dadosAnuais', 'dadosCards', 'totalGeral',
             'anosDisponiveis', 'categoriasDashboard',
             'receitas', 'despesas', 'saldo',
-            'maiorDespesaCategoriaId', 'maiorReceitaCategoriaId'
+            'maiorDespesaCategoriaId', 'maiorReceitaCategoriaId',
+            'maiorDespesaCategoriaNome', 'maiorReceitaCategoriaNome',
+            'maiorDespesaValor', 'maiorReceitaValor'
         ));
     }
 

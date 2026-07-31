@@ -197,10 +197,34 @@
                     </button>
                 </div>
             </div>
-            <span id="total-geral-badge"
-                  class="inline-block mt-2 text-sm font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl whitespace-nowrap">
-                Total: R$ {{ number_format($totalGeral, 2, ',', '.') }}
-            </span>
+            <div id="categorias-badges-row" class="flex flex-wrap items-center gap-2 mt-2">
+                <span id="total-geral-badge"
+                      class="inline-flex items-center flex-shrink-0 text-sm font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl whitespace-nowrap">
+                    Total: R$ {{ number_format($totalGeral, 2, ',', '.') }}
+                </span>
+                @if($maiorDespesaCategoriaId)
+                    <span id="maior-despesa-badge"
+                          class="inline-flex items-center gap-1 max-w-full text-sm font-bold text-rose-700 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-xl"
+                          title="Maior despesa do período" aria-label="Maior despesa do período">
+                        <svg width="12" height="12" class="flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"/>
+                        </svg>
+                        <span id="maior-despesa-nome" class="truncate min-w-0">{{ $maiorDespesaCategoriaNome }}</span>
+                        <span id="maior-despesa-valor" class="whitespace-nowrap flex-shrink-0">R$ {{ number_format($maiorDespesaValor, 2, ',', '.') }}</span>
+                    </span>
+                @endif
+                @if($maiorReceitaCategoriaId)
+                    <span id="maior-receita-badge"
+                          class="inline-flex items-center gap-1 max-w-full text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-xl"
+                          title="Maior receita do período" aria-label="Maior receita do período">
+                        <svg width="12" height="12" class="flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                        <span id="maior-receita-nome" class="truncate min-w-0">{{ $maiorReceitaCategoriaNome }}</span>
+                        <span id="maior-receita-valor" class="whitespace-nowrap flex-shrink-0">R$ {{ number_format($maiorReceitaValor, 2, ',', '.') }}</span>
+                    </span>
+                @endif
+            </div>
         </div>
 
         {{-- Filtro de busca por categoria --}}
@@ -408,6 +432,44 @@
 
                 document.getElementById('total-geral-badge').textContent =
                     'Total: ' + formatarMoeda(data.totalGeral);
+
+                // Badges de "maior despesa"/"maior receita" — removidos e
+                // recriados a cada filtro, já que podem aparecer, sumir ou
+                // trocar de categoria dependendo do período selecionado.
+                document.getElementById('maior-despesa-badge')?.remove();
+                document.getElementById('maior-receita-badge')?.remove();
+
+                const badgesRow = document.getElementById('categorias-badges-row');
+
+                function criarBadgeDestaque(id, nome, valor, cor, pathIcone, tituloAcessivel) {
+                    const span = document.createElement('span');
+                    span.id = id;
+                    span.className = `inline-flex items-center gap-1 max-w-full text-sm font-bold text-${cor}-700 bg-${cor}-50 border border-${cor}-100 px-2.5 py-1 rounded-xl`;
+                    span.title = tituloAcessivel;
+                    span.setAttribute('aria-label', tituloAcessivel);
+                    span.innerHTML = `
+                        <svg width="12" height="12" class="flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="${pathIcone}"/>
+                        </svg>
+                        <span class="truncate min-w-0"></span>
+                        <span class="whitespace-nowrap flex-shrink-0"></span>`;
+                    span.querySelector('span:nth-of-type(1)').textContent = nome;
+                    span.querySelector('span:nth-of-type(2)').textContent = formatarMoeda(valor);
+                    return span;
+                }
+
+                if (data.maiorDespesaCategoriaId) {
+                    badgesRow.appendChild(criarBadgeDestaque(
+                        'maior-despesa-badge', data.maiorDespesaCategoriaNome, data.maiorDespesaValor,
+                        'rose', 'M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6', 'Maior despesa do período'
+                    ));
+                }
+                if (data.maiorReceitaCategoriaId) {
+                    badgesRow.appendChild(criarBadgeDestaque(
+                        'maior-receita-badge', data.maiorReceitaCategoriaNome, data.maiorReceitaValor,
+                        'emerald', 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6', 'Maior receita do período'
+                    ));
+                }
 
                 const container = document.getElementById('container-categorias');
                 container.innerHTML = '';
