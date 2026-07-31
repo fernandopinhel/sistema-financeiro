@@ -213,6 +213,12 @@
     color: var(--fp-danger);
 }
 .fp-field-error svg { color: var(--fp-danger); flex-shrink: 0; }
+/* O atributo [hidden] deveria bastar sozinho, mas o `display:flex` acima
+   é do CSS do próprio app (author stylesheet) e empata em especificidade
+   com a regra padrão do navegador pra [hidden] — o do app vence o cascade
+   e o elemento fica visível mesmo "hidden" (vazio, mas com borda/padding
+   quando é o balão flutuante do passkey). Reforça explicitamente aqui. */
+.fp-field-error[hidden] { display: none; }
 
 /* Balão flutuante do erro de passkey — sai do fluxo do documento de
    propósito, pra não empurrar/redimensionar o card de login quando
